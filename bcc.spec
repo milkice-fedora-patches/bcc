@@ -1,6 +1,6 @@
 Name:		bcc
 Version:	0.2.0
-Release:	1%{?dist}
+Release:	2%{?dist}
 Summary:	BPF Compiler Collection (BCC)
 License:	ASL 2.0
 URL:		https://github.com/iovisor/bcc
@@ -11,7 +11,7 @@ Patch0:		%{name}-0.2.0-explicit-static.patch
 
 # Arches will be included as upstream support is added and dependencies are
 # satisfied in the respective arches
-ExclusiveArch:	x68_64
+ExclusiveArch:	x86_64
 
 BuildRequires:	bison, cmake >= 2.8.7, flex, libxml2-devel
 BuildRequires:	python3-devel
@@ -151,5 +151,8 @@ find %{buildroot}/usr/share/%{name}/man/man8/ -name "*.8" -exec gzip {} \;
 
 
 %changelog
+* Tue Jan 10 2017 Rafael Fonseca <rdossant@redhat.com> - 0.2.0-2
+- Fix typo
+
 * Tue Nov 29 2016 Rafael Fonseca <rdossant@redhat.com> - 0.2.0-1
 - Initial import
