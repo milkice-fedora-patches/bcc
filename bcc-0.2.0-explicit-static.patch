@@ -1,0 +1,28 @@
+--- bcc-0.2.0/src/cc/CMakeLists.txt	2017-01-05 16:01:59.069871274 +0100
++++ bcc-0.2.0/src/cc/CMakeLists.txt	2017-01-05 16:01:36.782847428 +0100
+@@ -39,7 +39,7 @@
+ set_target_properties(bcc-shared PROPERTIES VERSION ${REVISION_LAST} SOVERSION 0)
+ set_target_properties(bcc-shared PROPERTIES OUTPUT_NAME bcc)
+ 
+-add_library(bcc-loader-static libbpf.c perf_reader.c bcc_elf.c bcc_perf_map.c bcc_proc.c)
++add_library(bcc-loader-static STATIC libbpf.c perf_reader.c bcc_elf.c bcc_perf_map.c bcc_proc.c)
+ add_library(bcc-static STATIC bpf_common.cc bpf_module.cc shared_table.cc exported_files.cc bcc_syms.cc usdt_args.cc usdt.cc)
+ set_target_properties(bcc-static PROPERTIES OUTPUT_NAME bcc)
+ 
+--- bcc-0.2.0/src/cc/frontends/b/CMakeLists.txt	2017-01-05 16:02:17.133890595 +0100
++++ bcc-0.2.0/src/cc/frontends/b/CMakeLists.txt	2017-01-05 16:01:22.954832633 +0100
+@@ -11,5 +11,5 @@
+   set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/lexer.ll.cc PROPERTIES COMPILE_FLAGS "-Wno-deprecated-register")
+ endif()
+ 
+-add_library(b_frontend loader.cc codegen_llvm.cc node.cc parser.cc printer.cc
++add_library(b_frontend STATIC loader.cc codegen_llvm.cc node.cc parser.cc printer.cc
+   type_check.cc ${BISON_Parser_OUTPUTS} ${FLEX_Lexer_OUTPUTS})
+--- bcc-0.2.0/src/cc/frontends/clang/CMakeLists.txt	2017-01-05 16:02:48.788924466 +0100
++++ bcc-0.2.0/src/cc/frontends/clang/CMakeLists.txt	2017-01-05 16:02:36.038910825 +0100
+@@ -4,4 +4,4 @@
+ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DKERNEL_MODULES_DIR='\"${BCC_KERNEL_MODULES_DIR}\"'")
+ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DKERNEL_MODULES_SUFFIX='\"${BCC_KERNEL_MODULES_SUFFIX}\"'")
+ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DKERNEL_HAS_SOURCE_DIR=${BCC_KERNEL_HAS_SOURCE_DIR}")
+-add_library(clang_frontend loader.cc b_frontend_action.cc tp_frontend_action.cc kbuild_helper.cc)
++add_library(clang_frontend STATIC loader.cc b_frontend_action.cc tp_frontend_action.cc kbuild_helper.cc)
