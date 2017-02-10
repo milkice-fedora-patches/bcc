@@ -1,6 +1,6 @@
 Name:		bcc
 Version:	0.2.0
-Release:	2%{?dist}
+Release:	3%{?dist}
 Summary:	BPF Compiler Collection (BCC)
 License:	ASL 2.0
 URL:		https://github.com/iovisor/bcc
@@ -151,6 +151,9 @@ find %{buildroot}/usr/share/%{name}/man/man8/ -name "*.8" -exec gzip {} \;
 
 
 %changelog
+* Fri Feb 10 2017 Fedora Release Engineering <releng@fedoraproject.org> - 0.2.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
+
 * Tue Jan 10 2017 Rafael Fonseca <rdossant@redhat.com> - 0.2.0-2
 - Fix typo
 
