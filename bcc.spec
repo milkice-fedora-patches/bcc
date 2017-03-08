@@ -1,13 +1,10 @@
 Name:		bcc
-Version:	0.2.0
-Release:	2%{?dist}
+Version:	0.3.0
+Release:	1%{?dist}
 Summary:	BPF Compiler Collection (BCC)
 License:	ASL 2.0
 URL:		https://github.com/iovisor/bcc
 Source0:	https://github.com/iovisor/%{name}/archive/v%{version}.tar.gz
-
-# https://github.com/iovisor/bcc/issues/841
-Patch0:		%{name}-0.2.0-explicit-static.patch
 
 # Arches will be included as upstream support is added and dependencies are
 # satisfied in the respective arches
@@ -68,13 +65,16 @@ Requires:	%{name}%{?_isa} = %{version}-%{release}
 %description lua
 Standalone tool to run BCC tracers written in Lua
 
+
 %package tools
 Summary:	Command line tools for BPF Compiler Collection (BCC)
 Requires:	python3-%{name} = %{version}-%{release}
+Requires:	python3-netaddr
 BuildArch:	noarch
 
 %description tools
 Command line tools for BPF Compiler Collection (BCC)
+
 
 %prep
 %autosetup -p1
@@ -96,10 +96,13 @@ for i in `find %{buildroot}/usr/share/%{name}/tools/ -type f`; do
 	sed -i 's/\/usr\/bin\/python\>/&3/' $i
 done
 
+# Examples in /usr/share shouldn't contain binaries according to FHS
+rm -rf %{buildroot}/usr/share/%{name}/examples/cpp
 for i in `find %{buildroot}/usr/share/%{name}/examples/ -type f`; do
 	sed -i 's/\/usr\/bin\/env python\>/\/usr\/bin\/python3/' $i
 	sed -i 's/\/usr\/bin\/python\>/&3/' $i
 	sed -i 's/\/usr\/bin\/env bcc-lua\>/\/usr\/bin\/bcc-lua/' $i
+	chmod -x $i
 done
 
 # Compress man pages
@@ -151,6 +154,9 @@ find %{buildroot}/usr/share/%{name}/man/man8/ -name "*.8" -exec gzip {} \;
 
 
 %changelog
+* Thu Mar 09 2017 Rafael Fonseca <rdossant@redhat.com> - 0.3.0-1
+- Bump version to incorporate upstream fixes.
+
 * Tue Jan 10 2017 Rafael Fonseca <rdossant@redhat.com> - 0.2.0-2
 - Fix typo
 
