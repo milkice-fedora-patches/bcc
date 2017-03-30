@@ -1,10 +1,10 @@
 Name:		bcc
 Version:	0.3.0
-Release:	1%{?dist}
+Release:	2%{?dist}
 Summary:	BPF Compiler Collection (BCC)
 License:	ASL 2.0
 URL:		https://github.com/iovisor/bcc
-Source0:	https://github.com/iovisor/%{name}/archive/v%{version}.tar.gz
+Source0:	%{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 
 # Arches will be included as upstream support is added and dependencies are
 # satisfied in the respective arches
@@ -31,7 +31,6 @@ performance analysis and network traffic control.
 
 %package devel
 Summary:	Shared library for BPF Compiler Collection (BCC)
-Requires:	elfutils-libelf
 Requires:	%{name}%{?_isa} = %{version}-%{release}
 
 %description devel
@@ -84,7 +83,7 @@ Command line tools for BPF Compiler Collection (BCC)
 %cmake . -DREVISION_LAST=%{version} -DREVISION=%{version} -DPYTHON_CMD=python3 \
 	-DLUAJIT_INCLUDE_DIR=`pkg-config --variable=includedir luajit` \
 	-DLUAJIT_LIBRARIES=`pkg-config --variable=libdir luajit`/lib`pkg-config --variable=libname luajit`.so
-make %{?_smp_mflags}
+%make_build
 
 
 %install
@@ -125,8 +124,7 @@ find %{buildroot}/usr/share/%{name}/man/man8/ -name "*.8" -exec gzip {} \;
 %files devel
 %{_libdir}/lib%{name}.so
 %{_libdir}/pkgconfig/lib%{name}.pc
-%dir %{_includedir}/%{name}
-%{_includedir}/%{name}/*
+%{_includedir}/%{name}/
 
 %files -n python3-%{name}
 %{python3_sitelib}/%{name}*
@@ -154,6 +152,10 @@ find %{buildroot}/usr/share/%{name}/man/man8/ -name "*.8" -exec gzip {} \;
 
 
 %changelog
+* Thu Mar 30 2017 Igor Gnatenko <ignatenko@redhat.com> - 0.3.0-2
+- Rebuild for LLVM4
+- Trivial fixes in spec
+
 * Fri Mar 10 2017 Rafael Fonseca <rdossant@redhat.com> - 0.3.0-1
 - Rebase to new release.
 
