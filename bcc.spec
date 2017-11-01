@@ -17,7 +17,7 @@ Patch0:         0001-set-SOVERSION-for-bpf-shared.patch
 
 # Arches will be included as upstream support is added and dependencies are
 # satisfied in the respective arches
-ExclusiveArch:  x86_64 ppc64 ppc64le
+ExclusiveArch:  x86_64 %{power64}
 
 BuildRequires:  bison, cmake >= 2.8.7, flex, libxml2-devel
 BuildRequires:  python3-devel
