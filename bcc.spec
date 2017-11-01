@@ -1,8 +1,8 @@
 # luajit is not available for some architectures
 %ifarch ppc64 ppc64le
-%{!?with_lua: %global with_lua 0}
+%bcond_with lua
 %else
-%{!?with_lua: %global with_lua 1}
+%bcond_without lua
 %endif
 
 Name:           bcc
@@ -24,7 +24,7 @@ BuildRequires:  python3-devel
 BuildRequires:  elfutils-libelf-devel
 BuildRequires:  llvm-devel llvm-static clang-devel
 BuildRequires:  ncurses-devel
-%if %{with_lua}
+%if %{with lua}
 BuildRequires: pkgconfig(luajit)
 %endif
 
@@ -68,7 +68,7 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 Python3 bindings for BPF Compiler Collection (BCC)
 
 
-%if %{with_lua}
+%if %{with lua}
 %package lua
 Summary:        Standalone tool to run BCC tracers written in Lua
 Requires:       %{name}%{?_isa} = %{version}-%{release}
@@ -154,7 +154,7 @@ mv %{buildroot}/usr/share/%{name}/examples %{buildroot}/%{_docdir}/%{name}/
 %exclude %{_datadir}/%{name}/tools/old/
 %{_mandir}/man8/*
 
-%if %{with_lua}
+%if %{with lua}
 %files lua
 %{_bindir}/bcc-lua
 %endif
