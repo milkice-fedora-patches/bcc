@@ -95,7 +95,7 @@ Command line tools for BPF Compiler Collection (BCC)
 
 %build
 %cmake . \
-        -DCMAKE_BUILD_TYPE=RElWithDebInfo \
+        -DCMAKE_BUILD_TYPE=RelWithDebInfo \
         -DREVISION_LAST=%{version} -DREVISION=%{version} -DPYTHON_CMD=python3
 %make_build
 
