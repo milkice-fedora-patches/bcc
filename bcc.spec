@@ -104,20 +104,20 @@ Command line tools for BPF Compiler Collection (BCC)
 %make_install
 
 # Fix python shebangs
-for i in `find %{buildroot}/usr/share/%{name}/tools/ -type f`; do
+for i in `find %{buildroot}%{_datadir}/%{name}/tools/ -type f`; do
   sed -i '1s=^#!/usr/bin/\(python\|env python\)[0-9.]*=#!%{__python3}=' $i
 done
 
-for i in `find %{buildroot}/usr/share/%{name}/examples/ -type f`; do
+for i in `find %{buildroot}%{_datadir}/%{name}/examples/ -type f`; do
   sed -i '1s=^#!/usr/bin/\(python\|env python\)[0-9.]*=#!%{__python3}=' $i
   sed -i '1s=^#!/usr/bin/env bcc-lua.*=#!/usr/bin/bcc-lua=' $i
 done
 
 # Move man pages to the right location
-mkdir -p %{buildroot}/%{_mandir}
-mv %{buildroot}/usr/share/%{name}/man/* %{buildroot}/%{_mandir}/
-mkdir -p %{buildroot}/%{_docdir}/%{name}
-mv %{buildroot}/usr/share/%{name}/examples %{buildroot}/%{_docdir}/%{name}/
+mkdir -p %{buildroot}%{_mandir}
+mv %{buildroot}%{_datadir}%{name}/man/* %{buildroot}%{_mandir}/
+mkdir -p %{buildroot}%{_docdir}/%{name}
+mv %{buildroot}%{_datadir}/%{name}/examples %{buildroot}%{_docdir}/%{name}/
 
 # We cannot run the test suit since it requires root and it makes changes to
 # the machine (e.g, IP address)
