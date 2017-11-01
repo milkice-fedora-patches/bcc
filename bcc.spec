@@ -115,7 +115,7 @@ done
 
 # Move man pages to the right location
 mkdir -p %{buildroot}%{_mandir}
-mv %{buildroot}%{_datadir}%{name}/man/* %{buildroot}%{_mandir}/
+mv %{buildroot}%{_datadir}/%{name}/man/* %{buildroot}%{_mandir}/
 mkdir -p %{buildroot}%{_docdir}/%{name}
 mv %{buildroot}%{_datadir}/%{name}/examples %{buildroot}%{_docdir}/%{name}/
 
