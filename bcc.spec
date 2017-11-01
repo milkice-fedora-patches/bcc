@@ -7,7 +7,7 @@
 
 Name:           bcc
 Version:        0.4.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        BPF Compiler Collection (BCC)
 License:        ASL 2.0
 URL:            https://github.com/iovisor/bcc
@@ -161,6 +161,9 @@ mv %{buildroot}%{_datadir}/%{name}/examples %{buildroot}%{_docdir}/%{name}/
 
 
 %changelog
+* Wed Nov 01 2017 Igor Gnatenko <ignatenkobrain@fedoraproject.org> - 0.4.0-2
+- Rebuild for LLVM5
+
 * Wed Nov 01 2017 Rafael Fonseca <rdossant@redhat.com> - 0.4.0-1
 - Resolves #1460482 - rebase to new release
 - Resolves #1505506 - add support for LLVM 5.0
