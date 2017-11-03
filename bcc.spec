@@ -7,7 +7,7 @@
 
 Name:           bcc
 Version:        0.4.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        BPF Compiler Collection (BCC)
 License:        ASL 2.0
 URL:            https://github.com/iovisor/bcc
@@ -51,8 +51,8 @@ application that use BPF Compiler Collection (BCC).
 
 %package doc
 Summary:        Examples for BPF Compiler Collection (BCC)
-Requires:       python3-%{name} = %{version}-%{release}
-Requires:       %{name}-lua = %{version}-%{release}
+Recommends:     python3-%{name} = %{version}-%{release}
+Recommends:     %{name}-lua = %{version}-%{release}
 BuildArch:      noarch
 
 %description doc
@@ -161,6 +161,9 @@ mv %{buildroot}%{_datadir}/%{name}/examples %{buildroot}%{_docdir}/%{name}/
 
 
 %changelog
+* Thu Nov 02 2017 Rafael Santos <rdossant@redhat.com> - 0.4.0-3
+- Use weak deps to not require lua subpkg on ppc64(le)
+
 * Wed Nov 01 2017 Igor Gnatenko <ignatenkobrain@fedoraproject.org> - 0.4.0-2
 - Rebuild for LLVM5
 
