@@ -7,7 +7,7 @@
 
 Name:           bcc
 Version:        0.4.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        BPF Compiler Collection (BCC)
 License:        ASL 2.0
 URL:            https://github.com/iovisor/bcc
@@ -116,6 +116,12 @@ done
 # Move man pages to the right location
 mkdir -p %{buildroot}%{_mandir}
 mv %{buildroot}%{_datadir}/%{name}/man/* %{buildroot}%{_mandir}/
+# Avoid conflict with other manpages
+# https://bugzilla.redhat.com/show_bug.cgi?id=1517408
+for i in `find %{buildroot}%{_mandir} -name "*.8"`; do
+  tname=$(basename $i)
+  rename $tname %{name}-$tname $i
+done
 mkdir -p %{buildroot}%{_docdir}/%{name}
 mv %{buildroot}%{_datadir}/%{name}/examples %{buildroot}%{_docdir}/%{name}/
 
@@ -161,6 +167,9 @@ mv %{buildroot}%{_datadir}/%{name}/examples %{buildroot}%{_docdir}/%{name}/
 
 
 %changelog
+* Thu Nov 16 2017 Rafael Santos <rdossant@redhat.com> - 0.4.0-4
+- Resolves #1517408 - avoid conflict with other manpages
+
 * Thu Nov 02 2017 Rafael Santos <rdossant@redhat.com> - 0.4.0-3
 - Use weak deps to not require lua subpkg on ppc64(le)
 
