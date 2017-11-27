@@ -7,7 +7,7 @@
 
 Name:           bcc
 Version:        0.4.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        BPF Compiler Collection (BCC)
 License:        ASL 2.0
 URL:            https://github.com/iovisor/bcc
@@ -116,6 +116,12 @@ done
 # Move man pages to the right location
 mkdir -p %{buildroot}%{_mandir}
 mv %{buildroot}%{_datadir}/%{name}/man/* %{buildroot}%{_mandir}/
+# Avoid conflict with other manpages
+# https://bugzilla.redhat.com/show_bug.cgi?id=1517408
+for i in `find %{buildroot}%{_mandir} -name "*.8"`; do
+  tname=$(basename $i)
+  rename $tname %{name}-$tname $i
+done
 mkdir -p %{buildroot}%{_docdir}/%{name}
 mv %{buildroot}%{_datadir}/%{name}/examples %{buildroot}%{_docdir}/%{name}/
 
@@ -161,6 +167,9 @@ mv %{buildroot}%{_datadir}/%{name}/examples %{buildroot}%{_docdir}/%{name}/
 
 
 %changelog
+* Mon Nov 27 2017 Rafael Santos <rdossant@redhat.com> - 0.4.0-2
+- Resolves #1517408 - avoid conflict with other manpages
+
 * Wed Nov 01 2017 Rafael Fonseca <rdossant@redhat.com> - 0.4.0-1
 - Resolves #1460482 - rebase to new release
 - Resolves #1505506 - add support for LLVM 5.0
