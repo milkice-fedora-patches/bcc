@@ -6,14 +6,12 @@
 %endif
 
 Name:           bcc
-Version:        0.4.0
-Release:        4%{?dist}
+Version:        0.5.0
+Release:        1%{?dist}
 Summary:        BPF Compiler Collection (BCC)
 License:        ASL 2.0
 URL:            https://github.com/iovisor/bcc
 Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
-# https://github.com/iovisor/bcc/pull/1426
-Patch0:         0001-set-SOVERSION-for-bpf-shared.patch
 
 # Arches will be included as upstream support is added and dependencies are
 # satisfied in the respective arches
@@ -83,7 +81,6 @@ Summary:        Command line tools for BPF Compiler Collection (BCC)
 Requires:       python3-%{name} = %{version}-%{release}
 Requires:       python3-netaddr
 Requires:       kernel-devel
-BuildArch:      noarch
 
 %description tools
 Command line tools for BPF Compiler Collection (BCC)
@@ -156,7 +153,9 @@ mv %{buildroot}%{_datadir}/%{name}/examples %{buildroot}%{_docdir}/%{name}/
 %files tools
 %dir %{_datadir}/%{name}
 %dir %{_datadir}/%{name}/tools
+%dir %{_datadir}/%{name}/introspection
 %{_datadir}/%{name}/tools/*
+%{_datadir}/%{name}/introspection/*
 %exclude %{_datadir}/%{name}/tools/old/
 %{_mandir}/man8/*
 
@@ -167,6 +166,9 @@ mv %{buildroot}%{_datadir}/%{name}/examples %{buildroot}%{_docdir}/%{name}/
 
 
 %changelog
+* Wed Jan 03 2018 Rafael Santos <rdossant@redhat.com> - 0.5.0-1
+- Rebase to new released version
+
 * Thu Nov 16 2017 Rafael Santos <rdossant@redhat.com> - 0.4.0-4
 - Resolves #1517408 - avoid conflict with other manpages
 
