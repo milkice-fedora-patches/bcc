@@ -7,7 +7,7 @@
 
 Name:           bcc
 Version:        0.5.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        BPF Compiler Collection (BCC)
 License:        ASL 2.0
 URL:            https://github.com/iovisor/bcc
@@ -126,10 +126,7 @@ mv %{buildroot}%{_datadir}/%{name}/examples %{buildroot}%{_docdir}/%{name}/
 # the machine (e.g, IP address)
 #%check
 
-%post -p /sbin/ldconfig
-
-%postun -p /sbin/ldconfig
-
+%ldconfig_scriptlets
 
 %files
 %doc README.md
@@ -166,6 +163,9 @@ mv %{buildroot}%{_datadir}/%{name}/examples %{buildroot}%{_docdir}/%{name}/
 
 
 %changelog
+* Fri Feb 02 2018 Igor Gnatenko <ignatenkobrain@fedoraproject.org> - 0.5.0-2
+- Switch to %%ldconfig_scriptlets
+
 * Wed Jan 03 2018 Rafael Santos <rdossant@redhat.com> - 0.5.0-1
 - Rebase to new released version
 
