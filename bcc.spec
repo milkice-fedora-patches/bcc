@@ -6,13 +6,12 @@
 %endif
 
 Name:           bcc
-Version:        0.5.0
-Release:        4%{?dist}
+Version:        0.6.0
+Release:        1%{?dist}
 Summary:        BPF Compiler Collection (BCC)
 License:        ASL 2.0
 URL:            https://github.com/iovisor/bcc
 Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
-Patch0:         clang-api.patch
 
 # Arches will be included as upstream support is added and dependencies are
 # satisfied in the respective arches
@@ -164,6 +163,9 @@ mv %{buildroot}%{_datadir}/%{name}/examples %{buildroot}%{_docdir}/%{name}/
 
 
 %changelog
+* Mon Jun 18 2018 Rafael dos Santos <rdossant@redhat.com> - 0.6.0-1
+- Rebase to new released version (#1591989)
+
 * Thu Apr 05 2018 Rafael Santos <rdossant@redhat.com> - 0.5.0-4
 - Resolves #1555627 - fix compilation error with latest llvm/clang
 
