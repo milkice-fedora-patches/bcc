@@ -7,7 +7,7 @@
 
 Name:           bcc
 Version:        0.6.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        BPF Compiler Collection (BCC)
 License:        ASL 2.0
 URL:            https://github.com/iovisor/bcc
@@ -163,6 +163,9 @@ mv %{buildroot}%{_datadir}/%{name}/examples %{buildroot}%{_docdir}/%{name}/
 
 
 %changelog
+* Tue Jun 19 2018 Miro Hrončok <mhroncok@redhat.com> - 0.6.0-2
+- Rebuilt for Python 3.7
+
 * Mon Jun 18 2018 Rafael dos Santos <rdossant@redhat.com> - 0.6.0-1
 - Rebase to new released version (#1591989)
 
