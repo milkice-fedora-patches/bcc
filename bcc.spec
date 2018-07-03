@@ -6,7 +6,7 @@
 %endif
 
 Name:           bcc
-Version:        0.5.0
+Version:        0.6.0
 Release:        1%{?dist}
 Summary:        BPF Compiler Collection (BCC)
 License:        ASL 2.0
@@ -126,10 +126,7 @@ mv %{buildroot}%{_datadir}/%{name}/examples %{buildroot}%{_docdir}/%{name}/
 # the machine (e.g, IP address)
 #%check
 
-%post -p /sbin/ldconfig
-
-%postun -p /sbin/ldconfig
-
+%ldconfig_scriptlets
 
 %files
 %doc README.md
@@ -154,8 +151,8 @@ mv %{buildroot}%{_datadir}/%{name}/examples %{buildroot}%{_docdir}/%{name}/
 %dir %{_datadir}/%{name}
 %dir %{_datadir}/%{name}/tools
 %dir %{_datadir}/%{name}/introspection
-%{_datadir}/%{name}/introspection/*
 %{_datadir}/%{name}/tools/*
+%{_datadir}/%{name}/introspection/*
 %exclude %{_datadir}/%{name}/tools/old/
 %{_mandir}/man8/*
 
@@ -166,6 +163,9 @@ mv %{buildroot}%{_datadir}/%{name}/examples %{buildroot}%{_docdir}/%{name}/
 
 
 %changelog
+* Tue Jul 03 2018 Rafael dos Santos <rdossant@redhat.com> - 0.6.0-1
+- Rebase to new released version (#1591989)
+
 * Wed Jan 03 2018 Rafael Santos <rdossant@redhat.com> - 0.5.0-1
 - Rebase to new released version
 
