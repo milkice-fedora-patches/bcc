@@ -5,8 +5,10 @@
 %bcond_without lua
 %endif
 
+%bcond_without llvm_static
+
 Name:           bcc
-Version:        0.6.0
+Version:        0.6.1
 Release:        1%{?dist}
 Summary:        BPF Compiler Collection (BCC)
 License:        ASL 2.0
@@ -20,7 +22,10 @@ ExclusiveArch:  x86_64 %{power64}
 BuildRequires:  bison, cmake >= 2.8.7, flex, libxml2-devel
 BuildRequires:  python3-devel
 BuildRequires:  elfutils-libelf-devel
-BuildRequires:  llvm-devel llvm-static clang-devel
+BuildRequires:  llvm-devel clang-devel
+%if %{with llvm_static}
+BuildRequires: llvm-static
+%endif
 BuildRequires:  ncurses-devel
 %if %{with lua}
 BuildRequires: pkgconfig(luajit)
@@ -93,7 +98,8 @@ Command line tools for BPF Compiler Collection (BCC)
 %build
 %cmake . \
         -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-        -DREVISION_LAST=%{version} -DREVISION=%{version} -DPYTHON_CMD=python3
+        -DREVISION_LAST=%{version} -DREVISION=%{version} -DPYTHON_CMD=python3 \
+        %{?with_llvm_shared:-DENABLE_LLVM_SHARED=1}
 %make_build
 
 
@@ -101,21 +107,17 @@ Command line tools for BPF Compiler Collection (BCC)
 %make_install
 
 # Fix python shebangs
-for i in `find %{buildroot}%{_datadir}/%{name}/tools/ -type f`; do
-  sed -i '1s=^#!/usr/bin/\(python\|env python\)[0-9.]*=#!%{__python3}=' $i
-done
-
-for i in `find %{buildroot}%{_datadir}/%{name}/examples/ -type f`; do
-  sed -i '1s=^#!/usr/bin/\(python\|env python\)[0-9.]*=#!%{__python3}=' $i
-  sed -i '1s=^#!/usr/bin/env bcc-lua.*=#!/usr/bin/bcc-lua=' $i
-done
+find %{buildroot}%{_datadir}/%{name}/{tools,examples} -type f -exec \
+  sed -i -e '1s=^#!/usr/bin/python\([0-9.]\+\)\?$=#!%{__python3}=' \
+         -e '1s=^#!/usr/bin/env python\([0-9.]\+\)\?$=#!%{__python3}' \
+         -e '1s=^#!/usr/bin/env bcc-lua$=#!/usr/bin/bcc-lua=' {} \;
 
 # Move man pages to the right location
 mkdir -p %{buildroot}%{_mandir}
 mv %{buildroot}%{_datadir}/%{name}/man/* %{buildroot}%{_mandir}/
 # Avoid conflict with other manpages
 # https://bugzilla.redhat.com/show_bug.cgi?id=1517408
-for i in `find %{buildroot}%{_mandir} -name "*.8"`; do
+for i in `find %{buildroot}%{_mandir} -name "*.gz"`; do
   tname=$(basename $i)
   rename $tname %{name}-$tname $i
 done
@@ -130,7 +132,7 @@ mv %{buildroot}%{_datadir}/%{name}/examples %{buildroot}%{_docdir}/%{name}/
 
 %files
 %doc README.md
-%license LICENSE.txt COPYRIGHT.txt
+%license LICENSE.txt
 %{_libdir}/lib%{name}.so.*
 %{_libdir}/libbpf.so.*
 
@@ -163,6 +165,9 @@ mv %{buildroot}%{_datadir}/%{name}/examples %{buildroot}%{_docdir}/%{name}/
 
 
 %changelog
+* Thu Aug 16 2018 Rafael Fonseca <r4f4rfs@gmail.com> - 0.6.1-1
+- Rebase to new released version (#1609485)
+
 * Mon Jun 18 2018 Rafael dos Santos <rdossant@redhat.com> - 0.6.0-1
 - Rebase to new released version (#1591989)
 
