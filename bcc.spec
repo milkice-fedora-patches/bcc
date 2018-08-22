@@ -9,7 +9,7 @@
 
 Name:           bcc
 Version:        0.6.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        BPF Compiler Collection (BCC)
 License:        ASL 2.0
 URL:            https://github.com/iovisor/bcc
@@ -109,7 +109,7 @@ Command line tools for BPF Compiler Collection (BCC)
 # Fix python shebangs
 find %{buildroot}%{_datadir}/%{name}/{tools,examples} -type f -exec \
   sed -i -e '1s=^#!/usr/bin/python\([0-9.]\+\)\?$=#!%{__python3}=' \
-         -e '1s=^#!/usr/bin/env python\([0-9.]\+\)\?$=#!%{__python3}' \
+         -e '1s=^#!/usr/bin/env python\([0-9.]\+\)\?$=#!%{__python3}=' \
          -e '1s=^#!/usr/bin/env bcc-lua$=#!/usr/bin/bcc-lua=' {} \;
 
 # Move man pages to the right location
@@ -165,6 +165,9 @@ mv %{buildroot}%{_datadir}/%{name}/examples %{buildroot}%{_docdir}/%{name}/
 
 
 %changelog
+* Wed Aug 22 2018 Rafael Fonseca <r4f4rfs@gmail.com> - 0.6.1-2
+- Fix typo when mangling shebangs.
+
 * Thu Aug 16 2018 Rafael Fonseca <r4f4rfs@gmail.com> - 0.6.1-1
 - Rebase to new released version (#1609485)
 
