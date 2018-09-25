@@ -8,7 +8,7 @@
 %bcond_without llvm_static
 
 Name:           bcc
-Version:        0.6.1
+Version:        0.7.0
 Release:        1%{?dist}
 Summary:        BPF Compiler Collection (BCC)
 License:        ASL 2.0
@@ -165,6 +165,9 @@ mv %{buildroot}%{_datadir}/%{name}/examples %{buildroot}%{_docdir}/%{name}/
 
 
 %changelog
+* Tue Sep 25 2018 Rafael dos Santos <rdossant@redhat.com> - 0.7.0-1
+- Rebase to new release version
+
 * Wed Aug 22 2018 Rafael Fonseca <r4f4rfs@gmail.com> - 0.6.1-1
 - Rebase to new released version
 
