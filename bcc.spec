@@ -9,11 +9,14 @@
 
 Name:           bcc
 Version:        0.7.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        BPF Compiler Collection (BCC)
 License:        ASL 2.0
 URL:            https://github.com/iovisor/bcc
 Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
+
+# https://bugzilla.redhat.com/show_bug.cgi?id=1636293
+Patch0:         %{name}-%{version}-uflow-str-bytes.patch
 
 # Arches will be included as upstream support is added and dependencies are
 # satisfied in the respective arches
@@ -165,6 +168,9 @@ mv %{buildroot}%{_datadir}/%{name}/examples %{buildroot}%{_docdir}/%{name}/
 
 
 %changelog
+* Sat Oct 06 2018 Rafael dos Santos <rdossant@redhat.com> - 0.7.0-2
+- Fix str/bytes conversion in uflow (#1636293)
+
 * Tue Sep 25 2018 Rafael Fonseca <r4f4rfs@gmail.com> - 0.7.0-1
 - Rebase to new released version
 
