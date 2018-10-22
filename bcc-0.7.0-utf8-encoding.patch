@@ -1,0 +1,788 @@
+From b96ebcd2f328cd694101d657341faeb5869556a9 Mon Sep 17 00:00:00 2001
+From: jeromemarchand <38073585+jeromemarchand@users.noreply.github.com>
+Date: Wed, 10 Oct 2018 01:58:15 +0200
+Subject: [PATCH] Bytes/string encoding (#2004)
+
+* tools: uses 'replace' error handler by default in decode()
+
+Tools might encouter characters from non utf-8 charset (e.g. a file
+name). When this happen, it's better to replace the unexpected
+character by a question mark than crash the tool when all we do is
+to print the string.
+
+* tools: fix a bytes/string issue in attach_perf_event()
+---
+ tools/bashreadline.py   |  2 +-
+ tools/biosnoop.py       |  4 ++--
+ tools/biotop.py         |  4 ++--
+ tools/btrfsslower.py    | 10 ++++++----
+ tools/cachetop.py       |  2 +-
+ tools/capable.py        |  4 ++--
+ tools/dcsnoop.py        |  5 +++--
+ tools/ext4slower.py     | 10 ++++++----
+ tools/filelife.py       |  3 ++-
+ tools/fileslower.py     |  6 +++---
+ tools/filetop.py        |  7 ++++---
+ tools/funcslower.py     |  4 ++--
+ tools/gethostlatency.py |  4 ++--
+ tools/hardirqs.py       |  2 +-
+ tools/llcstat.py        |  2 +-
+ tools/mdflush.py        |  3 ++-
+ tools/mountsnoop.py     |  4 ++--
+ tools/nfsslower.py      |  4 ++--
+ tools/offcputime.py     |  4 ++--
+ tools/offwaketime.py    |  8 ++++----
+ tools/old/offcputime.py |  2 +-
+ tools/old/oomkill.py    |  4 ++--
+ tools/old/profile.py    |  2 +-
+ tools/old/wakeuptime.py |  8 ++++----
+ tools/oomkill.py        |  4 ++--
+ tools/opensnoop.py      |  3 ++-
+ tools/profile.py        |  8 ++++----
+ tools/sslsniff.py       |  5 +++--
+ tools/stackcount.py     |  2 +-
+ tools/statsnoop.py      |  5 +++--
+ tools/tcpaccept.py      |  7 ++++---
+ tools/tcpconnect.py     |  7 ++++---
+ tools/tcpconnlat.py     |  8 ++++----
+ tools/tcplife.py        |  4 ++--
+ tools/tcpstates.py      |  4 ++--
+ tools/tcptracer.py      |  4 ++--
+ tools/trace.py          |  3 ++-
+ tools/ttysnoop.py       |  2 +-
+ tools/zfsslower.py      | 10 ++++++----
+ 39 files changed, 100 insertions(+), 84 deletions(-)
+
+diff --git a/tools/bashreadline.py b/tools/bashreadline.py
+index aaf6fc7ce..89c37c307 100755
+--- a/tools/bashreadline.py
++++ b/tools/bashreadline.py
+@@ -57,7 +57,7 @@ class Data(ct.Structure):
+ def print_event(cpu, data, size):
+     event = ct.cast(data, ct.POINTER(Data)).contents
+     print("%-9s %-6d %s" % (strftime("%H:%M:%S"), event.pid,
+-                            event.str.decode()))
++                            event.str.decode('utf-8', 'replace')))
+ 
+ b["events"].open_perf_buffer(print_event)
+ while 1:
+diff --git a/tools/biosnoop.py b/tools/biosnoop.py
+index 7f61180c0..2b1e77d52 100755
+--- a/tools/biosnoop.py
++++ b/tools/biosnoop.py
+@@ -176,8 +176,8 @@ def print_event(cpu, data, size):
+         delta = float(delta) + (event.ts - prev_ts)
+ 
+     print("%-14.9f %-14.14s %-6s %-7s %-2s %-9s %-7s %7.2f" % (
+-        delta / 1000000, event.name.decode(), event.pid,
+-        event.disk_name.decode(), rwflg, val,
++        delta / 1000000, event.name.decode('utf-8', 'replace'), event.pid,
++        event.disk_name.decode('utf-8', 'replace'), rwflg, val,
+         event.len, float(event.delta) / 1000000))
+ 
+     prev_ts = event.ts
+diff --git a/tools/biotop.py b/tools/biotop.py
+index 63d6642c5..c6e1ca267 100755
+--- a/tools/biotop.py
++++ b/tools/biotop.py
+@@ -221,8 +221,8 @@ def signal_ignore(signal, frame):
+         # print line
+         avg_ms = (float(v.us) / 1000) / v.io
+         print("%-6d %-16s %1s %-3d %-3d %-8s %5s %7s %6.2f" % (k.pid,
+-            k.name.decode(), "W" if k.rwflag else "R", k.major, k.minor,
+-            diskname, v.io, v.bytes / 1024, avg_ms))
++            k.name.decode('utf-8', 'replace'), "W" if k.rwflag else "R",
++            k.major, k.minor, diskname, v.io, v.bytes / 1024, avg_ms))
+ 
+         line += 1
+         if line >= maxrows:
+diff --git a/tools/btrfsslower.py b/tools/btrfsslower.py
+index 644cb220b..d48e04cee 100755
+--- a/tools/btrfsslower.py
++++ b/tools/btrfsslower.py
+@@ -316,12 +316,14 @@ def print_event(cpu, data, size):
+ 
+     if (csv):
+         print("%d,%s,%d,%s,%d,%d,%d,%s" % (
+-            event.ts_us, event.task.decode(), event.pid, type, event.size,
+-            event.offset, event.delta_us, event.file.decode()))
++            event.ts_us, event.task.decode('utf-8', 'replace'), event.pid,
++            type, event.size, event.offset, event.delta_us,
++            event.file.decode('utf-8', 'replace')))
+         return
+     print("%-8s %-14.14s %-6s %1s %-7s %-8d %7.2f %s" % (strftime("%H:%M:%S"),
+-        event.task.decode(), event.pid, type, event.size, event.offset / 1024,
+-        float(event.delta_us) / 1000, event.file.decode()))
++        event.task.decode('utf-8', 'replace'), event.pid, type, event.size,
++        event.offset / 1024, float(event.delta_us) / 1000,
++        event.file.decode('utf-8', 'replace')))
+ 
+ # initialize BPF
+ b = BPF(text=bpf_text)
+diff --git a/tools/cachetop.py b/tools/cachetop.py
+index 0e08af929..101367541 100755
+--- a/tools/cachetop.py
++++ b/tools/cachetop.py
+@@ -72,7 +72,7 @@ def get_processes_stats(
+     counts = bpf.get_table("counts")
+     stats = defaultdict(lambda: defaultdict(int))
+     for k, v in counts.items():
+-        stats["%d-%d-%s" % (k.pid, k.uid, k.comm.decode())][k.ip] = v.value
++        stats["%d-%d-%s" % (k.pid, k.uid, k.comm.decode('utf-8', 'replace'))][k.ip] = v.value
+     stats_list = []
+ 
+     for pid, count in sorted(stats.items(), key=lambda stat: stat[0]):
+diff --git a/tools/capable.py b/tools/capable.py
+index 3e032e9ac..efcff4d62 100755
+--- a/tools/capable.py
++++ b/tools/capable.py
+@@ -148,8 +148,8 @@ def print_event(cpu, data, size):
+     else:
+         name = "?"
+     print("%-9s %-6d %-6d %-16s %-4d %-20s %d" % (strftime("%H:%M:%S"),
+-        event.uid, event.pid, event.comm.decode(), event.cap, name,
+-        event.audit))
++        event.uid, event.pid, event.comm.decode('utf-8', 'replace'),
++        event.cap, name, event.audit))
+ 
+ # loop with callback to print_event
+ b["events"].open_perf_buffer(print_event)
+diff --git a/tools/dcsnoop.py b/tools/dcsnoop.py
+index 070c87aad..13152c2ac 100755
+--- a/tools/dcsnoop.py
++++ b/tools/dcsnoop.py
+@@ -153,8 +153,9 @@ class Data(ct.Structure):
+ def print_event(cpu, data, size):
+     event = ct.cast(data, ct.POINTER(Data)).contents
+     print("%-11.6f %-6d %-16s %1s %s" % (
+-            time.time() - start_ts, event.pid, event.comm.decode(),
+-            mode_s[event.type], event.filename.decode()))
++            time.time() - start_ts, event.pid,
++            event.comm.decode('utf-8', 'replace'), mode_s[event.type],
++            event.filename.decode('utf-8', 'replace')))
+ 
+ # header
+ print("%-11s %-6s %-16s %1s %s" % ("TIME(s)", "PID", "COMM", "T", "FILE"))
+diff --git a/tools/ext4slower.py b/tools/ext4slower.py
+index eb6430e5c..88db8311c 100755
+--- a/tools/ext4slower.py
++++ b/tools/ext4slower.py
+@@ -314,12 +314,14 @@ def print_event(cpu, data, size):
+ 
+     if (csv):
+         print("%d,%s,%d,%s,%d,%d,%d,%s" % (
+-            event.ts_us, event.task.decode(), event.pid, type, event.size,
+-            event.offset, event.delta_us, event.file.decode()))
++            event.ts_us, event.task.decode('utf-8', 'replace'), event.pid,
++            type, event.size, event.offset, event.delta_us,
++            event.file.decode('utf-8', 'replace')))
+         return
+     print("%-8s %-14.14s %-6s %1s %-7s %-8d %7.2f %s" % (strftime("%H:%M:%S"),
+-        event.task.decode(), event.pid, type, event.size, event.offset / 1024,
+-        float(event.delta_us) / 1000, event.file.decode()))
++        event.task.decode('utf-8', 'replace'), event.pid, type, event.size,
++        event.offset / 1024, float(event.delta_us) / 1000,
++        event.file.decode('utf-8', 'replace')))
+ 
+ # initialize BPF
+ b = BPF(text=bpf_text)
+diff --git a/tools/filelife.py b/tools/filelife.py
+index 0f4e269b8..410659d01 100755
+--- a/tools/filelife.py
++++ b/tools/filelife.py
+@@ -136,7 +136,8 @@ class Data(ct.Structure):
+ def print_event(cpu, data, size):
+     event = ct.cast(data, ct.POINTER(Data)).contents
+     print("%-8s %-6d %-16s %-7.2f %s" % (strftime("%H:%M:%S"), event.pid,
+-        event.comm.decode(), float(event.delta) / 1000, event.fname.decode()))
++        event.comm.decode('utf-8', 'replace'), float(event.delta) / 1000,
++        event.fname.decode('utf-8', 'replace')))
+ 
+ b["events"].open_perf_buffer(print_event)
+ while 1:
+diff --git a/tools/fileslower.py b/tools/fileslower.py
+index 5caa4caf0..25443a230 100755
+--- a/tools/fileslower.py
++++ b/tools/fileslower.py
+@@ -240,13 +240,13 @@ def print_event(cpu, data, size):
+     event = ct.cast(data, ct.POINTER(Data)).contents
+ 
+     ms = float(event.delta_us) / 1000
+-    name = event.name.decode()
++    name = event.name.decode('utf-8', 'replace')
+     if event.name_len > DNAME_INLINE_LEN:
+         name = name[:-3] + "..."
+ 
+     print("%-8.3f %-14.14s %-6s %1s %-7s %7.2f %s" % (
+-        time.time() - start_ts, event.comm.decode(), event.pid,
+-        mode_s[event.mode], event.sz, ms, name))
++        time.time() - start_ts, event.comm.decode('utf-8', 'replace'),
++        event.pid, mode_s[event.mode], event.sz, ms, name))
+ 
+ b["events"].open_perf_buffer(print_event, page_cnt=64)
+ while 1:
+diff --git a/tools/filetop.py b/tools/filetop.py
+index 454dfd832..4c7a28ab8 100755
+--- a/tools/filetop.py
++++ b/tools/filetop.py
+@@ -190,14 +190,15 @@ def signal_ignore(signal, frame):
+     for k, v in reversed(sorted(counts.items(),
+                                 key=lambda counts:
+                                   getattr(counts[1], args.sort))):
+-        name = k.name.decode()
++        name = k.name.decode('utf-8', 'replace')
+         if k.name_len > DNAME_INLINE_LEN:
+             name = name[:-3] + "..."
+ 
+         # print line
+         print("%-6d %-16s %-6d %-6d %-7d %-7d %1s %s" % (k.pid,
+-            k.comm.decode(), v.reads, v.writes, v.rbytes / 1024,
+-            v.wbytes / 1024, k.type.decode(), name))
++            k.comm.decode('utf-8', 'replace'), v.reads, v.writes,
++            v.rbytes / 1024, v.wbytes / 1024,
++            k.type.decode('utf-8', 'replace'), name))
+ 
+         line += 1
+         if line >= maxrows:
+diff --git a/tools/funcslower.py b/tools/funcslower.py
+index 93fb84694..261869e8d 100755
+--- a/tools/funcslower.py
++++ b/tools/funcslower.py
+@@ -306,7 +306,7 @@ def print_stack(event):
+         # print folded stack output
+         user_stack = list(user_stack)
+         kernel_stack = list(kernel_stack)
+-        line = [event.comm.decode()] + \
++        line = [event.comm.decode('utf-8', 'replace')] + \
+             [b.sym(addr, event.tgid_pid) for addr in reversed(user_stack)] + \
+             (do_delimiter and ["-"] or []) + \
+             [b.ksym(addr) for addr in reversed(kernel_stack)]
+@@ -323,7 +323,7 @@ def print_event(cpu, data, size):
+     ts = float(event.duration_ns) / time_multiplier
+     if not args.folded:
+         print((time_str(event) + "%-14.14s %-6s %7.2f %16x %s %s") %
+-            (event.comm.decode(), event.tgid_pid >> 32,
++            (event.comm.decode('utf-8', 'replace'), event.tgid_pid >> 32,
+              ts, event.retval, args.functions[event.id], args_str(event)))
+     if args.user_stack or args.kernel_stack:
+         print_stack(event)
+diff --git a/tools/gethostlatency.py b/tools/gethostlatency.py
+index f1d7dea7c..3a967ae28 100755
+--- a/tools/gethostlatency.py
++++ b/tools/gethostlatency.py
+@@ -129,8 +129,8 @@ class Data(ct.Structure):
+ def print_event(cpu, data, size):
+     event = ct.cast(data, ct.POINTER(Data)).contents
+     print("%-9s %-6d %-16s %10.2f %s" % (strftime("%H:%M:%S"), event.pid,
+-        event.comm.decode(), (float(event.delta) / 1000000),
+-        event.host.decode()))
++        event.comm.decode('utf-8', 'replace'), (float(event.delta) / 1000000),
++        event.host.decode('utf-8', 'replace')))
+ 
+ # loop with callback to print_event
+ b["events"].open_perf_buffer(print_event)
+diff --git a/tools/hardirqs.py b/tools/hardirqs.py
+index 3835d635e..589a890dd 100755
+--- a/tools/hardirqs.py
++++ b/tools/hardirqs.py
+@@ -172,7 +172,7 @@
+     else:
+         print("%-26s %11s" % ("HARDIRQ", "TOTAL_" + label))
+         for k, v in sorted(dist.items(), key=lambda dist: dist[1].value):
+-            print("%-26s %11d" % (k.name.decode(), v.value / factor))
++            print("%-26s %11d" % (k.name.decode('utf-8', 'replace'), v.value / factor))
+     dist.clear()
+ 
+     countdown -= 1
+diff --git a/tools/llcstat.py b/tools/llcstat.py
+index fe8bdd9a5..ec2c1f8aa 100755
+--- a/tools/llcstat.py
++++ b/tools/llcstat.py
+@@ -113,7 +113,7 @@
+     # This happens on some PIDs due to missed counts caused by sampling
+     hit = (v.value - miss) if (v.value >= miss) else 0
+     print('{:<8d} {:<16s} {:<4d} {:>12d} {:>12d} {:>6.2f}%'.format(
+-        k.pid, k.name.decode(), k.cpu, v.value, miss,
++        k.pid, k.name.decode('utf-8', 'replace'), k.cpu, v.value, miss,
+         (float(hit) / float(v.value)) * 100.0))
+ print('Total References: {} Total Misses: {} Hit Rate: {:.2f}%'.format(
+     tot_ref, tot_miss, (float(tot_ref - tot_miss) / float(tot_ref)) * 100.0))
+diff --git a/tools/mdflush.py b/tools/mdflush.py
+index 1d29bf18f..70afc4d7c 100755
+--- a/tools/mdflush.py
++++ b/tools/mdflush.py
+@@ -72,7 +72,8 @@ class Data(ct.Structure):
+ def print_event(cpu, data, size):
+     event = ct.cast(data, ct.POINTER(Data)).contents
+     print("%-8s %-6d %-16s %s" % (strftime("%H:%M:%S"), event.pid,
+-        event.comm.decode(), event.disk.decode()))
++        event.comm.decode('utf-8', 'replace'),
++        event.disk.decode('utf-8', 'replace')))
+ 
+ # read events
+ b["events"].open_perf_buffer(print_event)
+diff --git a/tools/mountsnoop.py b/tools/mountsnoop.py
+index 2d0fa1a68..e9b586511 100755
+--- a/tools/mountsnoop.py
++++ b/tools/mountsnoop.py
+@@ -382,8 +382,8 @@ def print_event(mounts, umounts, cpu, data, size):
+                     flags=decode_umount_flags(syscall['flags']),
+                     retval=decode_errno(event.union.retval))
+             print('{:16} {:<7} {:<7} {:<11} {}'.format(
+-                syscall['comm'].decode(), syscall['tgid'], syscall['pid'],
+-                syscall['mnt_ns'], call))
++                syscall['comm'].decode('utf-8', 'replace'), syscall['tgid'],
++                syscall['pid'], syscall['mnt_ns'], call))
+     except KeyError:
+         # This might happen if we lost an event.
+         pass
+diff --git a/tools/nfsslower.py b/tools/nfsslower.py
+index 0f836afca..2f92c908a 100755
+--- a/tools/nfsslower.py
++++ b/tools/nfsslower.py
+@@ -280,13 +280,13 @@ def print_event(cpu, data, size):
+         return
+     print("%-8s %-14.14s %-6s %1s %-7s %-8d %7.2f %s" %
+           (strftime("%H:%M:%S"),
+-           event.task.decode(),
++           event.task.decode('utf-8', 'replace'),
+            event.pid,
+            type,
+            event.size,
+            event.offset / 1024,
+            float(event.delta_us) / 1000,
+-           event.file.decode()))
++           event.file.decode('utf-8', 'replace')))
+ 
+ 
+ # Currently specifically works for NFSv4, the other kprobes are generic
+diff --git a/tools/offcputime.py b/tools/offcputime.py
+index de77fb489..d84ae529f 100755
+--- a/tools/offcputime.py
++++ b/tools/offcputime.py
+@@ -281,7 +281,7 @@ def signal_ignore(signal, frame):
+         # print folded stack output
+         user_stack = list(user_stack)
+         kernel_stack = list(kernel_stack)
+-        line = [k.name.decode()]
++        line = [k.name.decode('utf-8', 'replace')]
+         # if we failed to get the stack is, such as due to no space (-ENOMEM) or
+         # hash collision (-EEXIST), we still print a placeholder for consistency
+         if not args.kernel_stacks_only:
+@@ -312,7 +312,7 @@ def signal_ignore(signal, frame):
+             else:
+                 for addr in user_stack:
+                     print("    %s" % b.sym(addr, k.tgid))
+-        print("    %-16s %s (%d)" % ("-", k.name.decode(), k.pid))
++        print("    %-16s %s (%d)" % ("-", k.name.decode('utf-8', 'replace'), k.pid))
+         print("        %d\n" % v.value)
+ 
+ if missing_stacks > 0:
+diff --git a/tools/offwaketime.py b/tools/offwaketime.py
+index 01961ee7f..674be2292 100755
+--- a/tools/offwaketime.py
++++ b/tools/offwaketime.py
+@@ -316,7 +316,7 @@ def signal_ignore(signal, frame):
+ 
+     if folded:
+         # print folded stack output
+-        line = [k.target.decode()]
++        line = [k.target.decode('utf-8', 'replace')]
+         if not args.kernel_stacks_only:
+             if stack_id_err(k.t_u_stack_id):
+                 line.append("[Missed User Stack]")
+@@ -344,11 +344,11 @@ def signal_ignore(signal, frame):
+             else:
+                 line.extend([b.sym(addr, k.w_tgid)
+                     for addr in reversed(list(waker_user_stack))])
+-        line.append(k.waker.decode())
++        line.append(k.waker.decode('utf-8', 'replace'))
+         print("%s %d" % (";".join(line), v.value))
+     else:
+         # print wakeup name then stack in reverse order
+-        print("    %-16s %s %s" % ("waker:", k.waker.decode(), k.t_pid))
++        print("    %-16s %s %s" % ("waker:", k.waker.decode('utf-8', 'replace'), k.t_pid))
+         if not args.kernel_stacks_only:
+             if stack_id_err(k.w_u_stack_id):
+                 print("    [Missed User Stack]")
+@@ -381,7 +381,7 @@ def signal_ignore(signal, frame):
+             else:
+                 for addr in target_user_stack:
+                     print("    %s" % b.sym(addr, k.t_tgid))
+-        print("    %-16s %s %s" % ("target:", k.target.decode(), k.w_pid))
++        print("    %-16s %s %s" % ("target:", k.target.decode('utf-8', 'replace'), k.w_pid))
+         print("        %d\n" % v.value)
+ 
+ if missing_stacks > 0:
+diff --git a/tools/old/offcputime.py b/tools/old/offcputime.py
+index 680d924dd..38d12a251 100755
+--- a/tools/old/offcputime.py
++++ b/tools/old/offcputime.py
+@@ -185,7 +185,7 @@ def signal_ignore(signal, frame):
+     for k, v in sorted(counts.items(), key=lambda counts: counts[1].value):
+         if folded:
+             # print folded stack output
+-            line = k.name.decode() + ";"
++            line = k.name.decode('utf-8', 'replace') + ";"
+             for i in reversed(range(0, maxdepth)):
+                 if k.ret[i] == 0:
+                     continue
+diff --git a/tools/old/oomkill.py b/tools/old/oomkill.py
+index e8e032157..b99f85274 100755
+--- a/tools/old/oomkill.py
++++ b/tools/old/oomkill.py
+@@ -68,8 +68,8 @@ def print_event(cpu, data, size):
+         avgline = stats.read().rstrip()
+     print(("%s Triggered by PID %d (\"%s\"), OOM kill of PID %d (\"%s\")"
+         ", %d pages, loadavg: %s") % (strftime("%H:%M:%S"), event.fpid,
+-        event.fcomm.decode(), event.tpid, event.tcomm.decode(), event.pages,
+-        avgline))
++        event.fcomm.decode('utf-8', 'replace'), event.tpid,
++        event.tcomm.decode('utf-8', 'replace'), event.pages, avgline))
+ 
+ # initialize BPF
+ b = BPF(text=bpf_text)
+diff --git a/tools/old/profile.py b/tools/old/profile.py
+index 04ca13af6..e308208ee 100755
+--- a/tools/old/profile.py
++++ b/tools/old/profile.py
+@@ -339,7 +339,7 @@ def aksym(addr):
+         # print folded stack output
+         user_stack = list(user_stack)
+         kernel_stack = list(kernel_stack)
+-        line = [k.name.decode()] + \
++        line = [k.name.decode('utf-8', 'replace')] + \
+             [b.sym(addr, k.pid) for addr in reversed(user_stack)] + \
+             (do_delimiter and ["-"] or []) + \
+             [aksym(addr) for addr in reversed(kernel_stack)]
+diff --git a/tools/old/wakeuptime.py b/tools/old/wakeuptime.py
+index e09840aa4..783c7ffbb 100644
+--- a/tools/old/wakeuptime.py
++++ b/tools/old/wakeuptime.py
+@@ -199,23 +199,23 @@ def signal_ignore(signal, frame):
+     for k, v in sorted(counts.items(), key=lambda counts: counts[1].value):
+         if folded:
+             # print folded stack output
+-            line = k.waker.decode() + ";"
++            line = k.waker.decode('utf-8', 'replace') + ";"
+             for i in reversed(range(0, maxdepth)):
+                 if k.ret[i] == 0:
+                     continue
+                 line = line + b.ksym(k.ret[i])
+                 if i != 0:
+                     line = line + ";"
+-            print("%s;%s %d" % (line, k.target.decode(), v.value))
++            print("%s;%s %d" % (line, k.target.decode('utf-8', 'replace'), v.value))
+         else:
+             # print default multi-line stack output
+-            print("    %-16s %s" % ("target:", k.target.decode()))
++            print("    %-16s %s" % ("target:", k.target.decode('utf-8', 'replace')))
+             for i in range(0, maxdepth):
+                 if k.ret[i] == 0:
+                     break
+                 print("    %-16x %s" % (k.ret[i],
+                     b.ksym(k.ret[i])))
+-            print("    %-16s %s" % ("waker:", k.waker.decode()))
++            print("    %-16s %s" % ("waker:", k.waker.decode('utf-8', 'replace')))
+             print("        %d\n" % v.value)
+     counts.clear()
+ 
+diff --git a/tools/oomkill.py b/tools/oomkill.py
+index e831d443a..0677e49ef 100755
+--- a/tools/oomkill.py
++++ b/tools/oomkill.py
+@@ -69,8 +69,8 @@ def print_event(cpu, data, size):
+         avgline = stats.read().rstrip()
+     print(("%s Triggered by PID %d (\"%s\"), OOM kill of PID %d (\"%s\")"
+         ", %d pages, loadavg: %s") % (strftime("%H:%M:%S"), event.fpid,
+-        event.fcomm.decode(), event.tpid, event.tcomm.decode(), event.pages,
+-        avgline))
++        event.fcomm.decode('utf-8', 'replace'), event.tpid,
++        event.tcomm.decode('utf-8', 'replace'), event.pages, avgline))
+ 
+ # initialize BPF
+ b = BPF(text=bpf_text)
+diff --git a/tools/opensnoop.py b/tools/opensnoop.py
+index a0657d42a..418d47bc6 100755
+--- a/tools/opensnoop.py
++++ b/tools/opensnoop.py
+@@ -184,7 +184,8 @@ def print_event(cpu, data, size):
+ 
+     print("%-6d %-16s %4d %3d %s" %
+           (event.id & 0xffffffff if args.tid else event.id >> 32,
+-           event.comm.decode(), fd_s, err, event.fname.decode()))
++           event.comm.decode('utf-8', 'replace'), fd_s, err,
++           event.fname.decode('utf-8', 'replace')))
+ 
+ # loop with callback to print_event
+ b["events"].open_perf_buffer(print_event, page_cnt=64)
+diff --git a/tools/profile.py b/tools/profile.py
+index 1530b9885..d1d3d26ac 100755
+--- a/tools/profile.py
++++ b/tools/profile.py
+@@ -268,7 +268,7 @@ def signal_ignore(signal, frame):
+ 
+ def aksym(addr):
+     if args.annotations:
+-        return b.ksym(addr) + "_[k]"
++        return b.ksym(addr) + "_[k]".encode()
+     else:
+         return b.ksym(addr)
+ 
+@@ -320,7 +320,7 @@ def aksym(addr):
+                 line.append("[Missed Kernel Stack]")
+             else:
+                 line.extend([b.ksym(addr) for addr in reversed(kernel_stack)])
+-        print("%s %d" % (b";".join(line).decode(), v.value))
++        print("%s %d" % (b";".join(line).decode('utf-8', 'replace'), v.value))
+     else:
+         # print default multi-line stack output
+         if not args.user_stacks_only:
+@@ -336,8 +336,8 @@ def aksym(addr):
+                 print("    [Missed User Stack]")
+             else:
+                 for addr in user_stack:
+-                    print("    %s" % b.sym(addr, k.pid).decode())
+-        print("    %-16s %s (%d)" % ("-", k.name.decode(), k.pid))
++                    print("    %s" % b.sym(addr, k.pid).decode('utf-8', 'replace'))
++        print("    %-16s %s (%d)" % ("-", k.name.decode('utf-8', 'replace'), k.pid))
+         print("        %d\n" % v.value)
+ 
+ # check missing
+diff --git a/tools/sslsniff.py b/tools/sslsniff.py
+index 2e74fbaa8..0c9f976b5 100755
+--- a/tools/sslsniff.py
++++ b/tools/sslsniff.py
+@@ -221,8 +221,9 @@ def print_event(cpu, data, size, rw):
+                 " bytes lost) " + "-" * 5
+ 
+     fmt = "%-12s %-18.9f %-16s %-6d %-6d\n%s\n%s\n%s\n\n"
+-    print(fmt % (rw, time_s, event.comm.decode(), event.pid, event.len, s_mark,
+-                 event.v0.decode(), e_mark))
++    print(fmt % (rw, time_s, event.comm.decode('utf-8', 'replace'),
++                 event.pid, event.len, s_mark,
++                 event.v0.decode('utf-8', 'replace'), e_mark))
+ 
+ b["perf_SSL_write"].open_perf_buffer(print_event_write)
+ b["perf_SSL_read"].open_perf_buffer(print_event_read)
+diff --git a/tools/stackcount.py b/tools/stackcount.py
+index 8781879f8..5554014fc 100755
+--- a/tools/stackcount.py
++++ b/tools/stackcount.py
+@@ -339,7 +339,7 @@ def run(self):
+                     # print folded stack output
+                     user_stack = list(user_stack)
+                     kernel_stack = list(kernel_stack)
+-                    line = [k.name.decode()] + \
++                    line = [k.name.decode('utf-8', 'replace')] + \
+                         [b.sym(addr, k.tgid) for addr in
+                         reversed(user_stack)] + \
+                         (self.need_delimiter and ["-"] or []) + \
+diff --git a/tools/statsnoop.py b/tools/statsnoop.py
+index 6fd8049c1..4e62ebd2c 100755
+--- a/tools/statsnoop.py
++++ b/tools/statsnoop.py
+@@ -172,8 +172,9 @@ def print_event(cpu, data, size):
+     if args.timestamp:
+         print("%-14.9f" % (float(event.ts_ns - start_ts) / 1000000000), end="")
+ 
+-    print("%-6d %-16s %4d %3d %s" % (event.pid, event.comm.decode(),
+-        fd_s, err, event.fname.decode()))
++    print("%-6d %-16s %4d %3d %s" % (event.pid,
++        event.comm.decode('utf-8', 'replace'), fd_s, err,
++        event.fname.decode('utf-8', 'replace')))
+ 
+ # loop with callback to print_event
+ b["events"].open_perf_buffer(print_event, page_cnt=64)
+diff --git a/tools/tcpaccept.py b/tools/tcpaccept.py
+index 044f15cda..884b0c517 100755
+--- a/tools/tcpaccept.py
++++ b/tools/tcpaccept.py
+@@ -239,7 +239,7 @@ def print_ipv4_event(cpu, data, size):
+             start_ts = event.ts_us
+         print("%-9.3f" % ((float(event.ts_us) - start_ts) / 1000000), end="")
+     print("%-6d %-12.12s %-2d %-16s %-16s %-4d" % (event.pid,
+-        event.task.decode(), event.ip,
++        event.task.decode('utf-8', 'replace'), event.ip,
+         inet_ntop(AF_INET, pack("I", event.daddr)),
+         inet_ntop(AF_INET, pack("I", event.saddr)), event.lport))
+ 
+@@ -251,8 +251,9 @@ def print_ipv6_event(cpu, data, size):
+             start_ts = event.ts_us
+         print("%-9.3f" % ((float(event.ts_us) - start_ts) / 1000000), end="")
+     print("%-6d %-12.12s %-2d %-16s %-16s %-4d" % (event.pid,
+-        event.task.decode(), event.ip, inet_ntop(AF_INET6, event.daddr),
+-        inet_ntop(AF_INET6, event.saddr), event.lport))
++        event.task.decode('utf-8', 'replace'), event.ip,
++        inet_ntop(AF_INET6, event.daddr),inet_ntop(AF_INET6, event.saddr),
++        event.lport))
+ 
+ # initialize BPF
+ b = BPF(text=bpf_text)
+diff --git a/tools/tcpconnect.py b/tools/tcpconnect.py
+index f0b23b0c4..ac84326a6 100755
+--- a/tools/tcpconnect.py
++++ b/tools/tcpconnect.py
+@@ -202,7 +202,7 @@ def print_ipv4_event(cpu, data, size):
+             start_ts = event.ts_us
+         print("%-9.3f" % ((float(event.ts_us) - start_ts) / 1000000), end="")
+     print("%-6d %-12.12s %-2d %-16s %-16s %-4d" % (event.pid,
+-        event.task.decode(), event.ip,
++        event.task.decode('utf-8', 'replace'), event.ip,
+         inet_ntop(AF_INET, pack("I", event.saddr)),
+         inet_ntop(AF_INET, pack("I", event.daddr)), event.dport))
+ 
+@@ -214,8 +214,9 @@ def print_ipv6_event(cpu, data, size):
+             start_ts = event.ts_us
+         print("%-9.3f" % ((float(event.ts_us) - start_ts) / 1000000), end="")
+     print("%-6d %-12.12s %-2d %-16s %-16s %-4d" % (event.pid,
+-        event.task.decode(), event.ip, inet_ntop(AF_INET6, event.saddr),
+-        inet_ntop(AF_INET6, event.daddr), event.dport))
++        event.task.decode('utf-8', 'replace'), event.ip,
++        inet_ntop(AF_INET6, event.saddr), inet_ntop(AF_INET6, event.daddr),
++        event.dport))
+ 
+ # initialize BPF
+ b = BPF(text=bpf_text)
+diff --git a/tools/tcpconnlat.py b/tools/tcpconnlat.py
+index 233612b49..0d21b837c 100755
+--- a/tools/tcpconnlat.py
++++ b/tools/tcpconnlat.py
+@@ -237,7 +237,7 @@ def print_ipv4_event(cpu, data, size):
+             start_ts = event.ts_us
+         print("%-9.3f" % ((float(event.ts_us) - start_ts) / 1000000), end="")
+     print("%-6d %-12.12s %-2d %-16s %-16s %-5d %.2f" % (event.pid,
+-        event.task.decode(), event.ip,
++        event.task.decode('utf-8', 'replace'), event.ip,
+         inet_ntop(AF_INET, pack("I", event.saddr)),
+         inet_ntop(AF_INET, pack("I", event.daddr)), event.dport,
+         float(event.delta_us) / 1000))
+@@ -250,9 +250,9 @@ def print_ipv6_event(cpu, data, size):
+             start_ts = event.ts_us
+         print("%-9.3f" % ((float(event.ts_us) - start_ts) / 1000000), end="")
+     print("%-6d %-12.12s %-2d %-16s %-16s %-5d %.2f" % (event.pid,
+-        event.task.decode(), event.ip, inet_ntop(AF_INET6, event.saddr),
+-        inet_ntop(AF_INET6, event.daddr), event.dport,
+-        float(event.delta_us) / 1000))
++        event.task.decode('utf-8', 'replace'), event.ip,
++        inet_ntop(AF_INET6, event.saddr), inet_ntop(AF_INET6, event.daddr),
++        event.dport, float(event.delta_us) / 1000))
+ 
+ # header
+ if args.timestamp:
+diff --git a/tools/tcplife.py b/tools/tcplife.py
+index f8bab435b..51ed7ae2a 100755
+--- a/tools/tcplife.py
++++ b/tools/tcplife.py
+@@ -454,7 +454,7 @@ def print_ipv4_event(cpu, data, size):
+             print("%.6f," % delta_s, end="")
+         else:
+             print("%-9.6f " % delta_s, end="")
+-    print(format_string % (event.pid, event.task.decode(),
++    print(format_string % (event.pid, event.task.decode('utf-8', 'replace'),
+         "4" if args.wide or args.csv else "",
+         inet_ntop(AF_INET, pack("I", event.saddr)), event.ports >> 32,
+         inet_ntop(AF_INET, pack("I", event.daddr)), event.ports & 0xffffffff,
+@@ -476,7 +476,7 @@ def print_ipv6_event(cpu, data, size):
+             print("%.6f," % delta_s, end="")
+         else:
+             print("%-9.6f " % delta_s, end="")
+-    print(format_string % (event.pid, event.task.decode(),
++    print(format_string % (event.pid, event.task.decode('utf-8', 'replace'),
+         "6" if args.wide or args.csv else "",
+         inet_ntop(AF_INET6, event.saddr), event.ports >> 32,
+         inet_ntop(AF_INET6, event.daddr), event.ports & 0xffffffff,
+diff --git a/tools/tcpstates.py b/tools/tcpstates.py
+index ec758d22a..381a6d50f 100755
+--- a/tools/tcpstates.py
++++ b/tools/tcpstates.py
+@@ -276,7 +276,7 @@ def print_ipv4_event(cpu, data, size):
+             print("%.6f," % delta_s, end="")
+         else:
+             print("%-9.6f " % delta_s, end="")
+-    print(format_string % (event.skaddr, event.pid, event.task.decode(),
++    print(format_string % (event.skaddr, event.pid, event.task.decode('utf-8', 'replace'),
+         "4" if args.wide or args.csv else "",
+         inet_ntop(AF_INET, pack("I", event.saddr)), event.ports >> 32,
+         inet_ntop(AF_INET, pack("I", event.daddr)), event.ports & 0xffffffff,
+@@ -299,7 +299,7 @@ def print_ipv6_event(cpu, data, size):
+             print("%.6f," % delta_s, end="")
+         else:
+             print("%-9.6f " % delta_s, end="")
+-    print(format_string % (event.skaddr, event.pid, event.task.decode(),
++    print(format_string % (event.skaddr, event.pid, event.task.decode('utf-8', 'replace'),
+         "6" if args.wide or args.csv else "",
+         inet_ntop(AF_INET6, event.saddr), event.ports >> 32,
+         inet_ntop(AF_INET6, event.daddr), event.ports & 0xffffffff,
+diff --git a/tools/tcptracer.py b/tools/tcptracer.py
+index 5e97ee685..16bb4b1a8 100755
+--- a/tools/tcptracer.py
++++ b/tools/tcptracer.py
+@@ -556,7 +556,7 @@ def print_ipv4_event(cpu, data, size):
+         print("%-2s " % (type_str), end="")
+ 
+     print("%-6d %-16s %-2d %-16s %-16s %-6d %-6d" %
+-          (event.pid, event.comm.decode('utf-8'),
++          (event.pid, event.comm.decode('utf-8', 'replace'),
+            event.ip,
+            inet_ntop(AF_INET, pack("I", event.saddr)),
+            inet_ntop(AF_INET, pack("I", event.daddr)),
+@@ -593,7 +593,7 @@ def print_ipv6_event(cpu, data, size):
+         print("%-2s " % (type_str), end="")
+ 
+     print("%-6d %-16s %-2d %-16s %-16s %-6d %-6d" %
+-          (event.pid, event.comm.decode('utf-8'),
++          (event.pid, event.comm.decode('utf-8', 'replace'),
+            event.ip,
+            "[" + inet_ntop(AF_INET6, event.saddr) + "]",
+            "[" + inet_ntop(AF_INET6, event.daddr) + "]",
+diff --git a/tools/trace.py b/tools/trace.py
+index 16e9b6b86..22333056b 100755
+--- a/tools/trace.py
++++ b/tools/trace.py
+@@ -558,7 +558,8 @@ def print_event(self, bpf, cpu, data, size):
+                 if Probe.print_cpu:
+                     print("%-3s " % event.cpu, end="")
+                 print("%-7d %-7d %-15s %-16s %s" %
+-                      (event.tgid, event.pid, event.comm.decode(),
++                      (event.tgid, event.pid,
++                       event.comm.decode('utf-8', 'replace'),
+                        self._display_function(), msg))
+ 
+                 if self.kernel_stack:
+diff --git a/tools/ttysnoop.py b/tools/ttysnoop.py
+index e9344865f..978051815 100755
+--- a/tools/ttysnoop.py
++++ b/tools/ttysnoop.py
+@@ -115,7 +115,7 @@ class Data(ct.Structure):
+ # process event
+ def print_event(cpu, data, size):
+     event = ct.cast(data, ct.POINTER(Data)).contents
+-    print("%s" % event.buf[0:event.count].decode(), end="")
++    print("%s" % event.buf[0:event.count].decode('utf-8', 'replace'), end="")
+     sys.stdout.flush()
+ 
+ # loop with callback to print_event
+diff --git a/tools/zfsslower.py b/tools/zfsslower.py
+index 6de4606a8..8ab283a7d 100755
+--- a/tools/zfsslower.py
++++ b/tools/zfsslower.py
+@@ -265,12 +265,14 @@ def print_event(cpu, data, size):
+ 
+     if (csv):
+         print("%d,%s,%d,%s,%d,%d,%d,%s" % (
+-            event.ts_us, event.task.decode(), event.pid, type, event.size,
+-            event.offset, event.delta_us, event.file.decode()))
++            event.ts_us, event.task.decode('utf-8', 'replace'), event.pid,
++            type, event.size, event.offset, event.delta_us,
++            event.file.decode('utf-8', 'replace')))
+         return
+     print("%-8s %-14.14s %-6s %1s %-7s %-8d %7.2f %s" % (strftime("%H:%M:%S"),
+-        event.task.decode(), event.pid, type, event.size, event.offset / 1024,
+-        float(event.delta_us) / 1000, event.file.decode()))
++        event.task.decode('utf-8', 'replace'), event.pid, type, event.size,
++        event.offset / 1024, float(event.delta_us) / 1000,
++        event.file.decode('utf-8', 'replace')))
+ 
+ # initialize BPF
+ b = BPF(text=bpf_text)
