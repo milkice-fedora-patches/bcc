@@ -9,7 +9,7 @@
 
 Name:           bcc
 Version:        0.7.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        BPF Compiler Collection (BCC)
 License:        ASL 2.0
 URL:            https://github.com/iovisor/bcc
@@ -17,6 +17,10 @@ Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1636293
 Patch0:         %{name}-%{version}-uflow-str-bytes.patch
+# https://bugzilla.redhat.com/show_bug.cgi?id=1516678
+Patch1:         %{name}-%{version}-utf8-encoding.patch
+# https://bugzilla.redhat.com/show_bug.cgi?id=1637515
+Patch2:         %{name}-%{version}-killsnoop-str-bytes.patch
 
 # Arches will be included as upstream support is added and dependencies are
 # satisfied in the respective arches
@@ -168,6 +172,10 @@ mv %{buildroot}%{_datadir}/%{name}/examples %{buildroot}%{_docdir}/%{name}/
 
 
 %changelog
+* Mon Oct 22 2018 Rafael dos Santos <rdossant@redhat.com> - 0.7.0-3
+- Fix encoding of non-utf8 characters (#1516678)
+- Fix str-bytes conversion in killsnoop (#1637515)
+
 * Sat Oct 06 2018 Rafael dos Santos <rdossant@redhat.com> - 0.7.0-2
 - Fix str/bytes conversion in uflow (#1636293)
 
