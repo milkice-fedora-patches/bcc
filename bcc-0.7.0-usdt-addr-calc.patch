@@ -1,0 +1,24 @@
+From b998421b18a34d0b47a6bda996c91bad12fa5da0 Mon Sep 17 00:00:00 2001
+From: Ildar Musin <zildermann@gmail.com>
+Date: Thu, 1 Nov 2018 01:19:41 +0100
+Subject: [PATCH] Fix USDT semaphore address calculation for position
+ independent executables (resolves #1998) (#2023)
+
+Fix USDT semaphore address calculation for position independent executables
+---
+ src/cc/bcc_syms.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/cc/bcc_syms.cc b/src/cc/bcc_syms.cc
+index a52e3f432..be9781afc 100644
+--- a/src/cc/bcc_syms.cc
++++ b/src/cc/bcc_syms.cc
+@@ -444,7 +444,7 @@ int bcc_resolve_global_addr(int pid, const char *module, const uint64_t address,
+       mod.start == 0x0)
+     return -1;
+ 
+-  *global = mod.start + mod.file_offset + address;
++  *global = mod.start - mod.file_offset + address;
+   return 0;
+ }
+ 
