@@ -8,21 +8,12 @@
 %bcond_without llvm_static
 
 Name:           bcc
-Version:        0.7.0
-Release:        4%{?dist}
+Version:        0.8.0
+Release:        1%{?dist}
 Summary:        BPF Compiler Collection (BCC)
 License:        ASL 2.0
 URL:            https://github.com/iovisor/bcc
 Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
-
-# https://bugzilla.redhat.com/show_bug.cgi?id=1636293
-Patch0:         %{name}-%{version}-uflow-str-bytes.patch
-# https://bugzilla.redhat.com/show_bug.cgi?id=1516678
-Patch1:         %{name}-%{version}-utf8-encoding.patch
-# https://bugzilla.redhat.com/show_bug.cgi?id=1637515
-Patch2:         %{name}-%{version}-killsnoop-str-bytes.patch
-# https://bugzilla.redhat.com/show_bug.cgi?id=1634684
-Patch3:         %{name}-%{version}-usdt-addr-calc.patch
 
 # Arches will be included as upstream support is added and dependencies are
 # satisfied in the respective arches
@@ -174,6 +165,9 @@ mv %{buildroot}%{_datadir}/%{name}/examples %{buildroot}%{_docdir}/%{name}/
 
 
 %changelog
+* Thu Jan 17 2019 Rafael dos Santos <rdossant@redhat.com> - 0.8.0-1
+- Rebase to new released version
+
 * Thu Nov 01 2018 Rafael dos Santos <rdossant@redhat.com> - 0.7.0-4
 - Fix attaching to usdt probes (#1634684)
 
