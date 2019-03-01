@@ -9,7 +9,7 @@
 
 Name:           bcc
 Version:        0.8.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        BPF Compiler Collection (BCC)
 License:        ASL 2.0
 URL:            https://github.com/iovisor/bcc
@@ -17,7 +17,7 @@ Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 
 # Arches will be included as upstream support is added and dependencies are
 # satisfied in the respective arches
-ExclusiveArch:  x86_64 %{power64}
+ExclusiveArch:  x86_64 %{power64} aarch64
 
 BuildRequires:  bison, cmake >= 2.8.7, flex, libxml2-devel
 BuildRequires:  python3-devel
@@ -165,6 +165,9 @@ mv %{buildroot}%{_datadir}/%{name}/examples %{buildroot}%{_docdir}/%{name}/
 
 
 %changelog
+* Wed Feb 20 2019 Rafael dos Santos <rdossant@redhat.com> - 0.8.0-3
+- Add aarch64 support (#1679310)
+
 * Thu Jan 31 2019 Fedora Release Engineering <releng@fedoraproject.org> - 0.8.0-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
 
