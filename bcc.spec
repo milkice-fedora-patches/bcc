@@ -1,5 +1,5 @@
 # luajit is not available for some architectures
-%ifarch ppc64 ppc64le
+%ifarch ppc64 ppc64le s390x
 %bcond_with lua
 %else
 %bcond_without lua
@@ -9,15 +9,18 @@
 
 Name:           bcc
 Version:        0.8.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        BPF Compiler Collection (BCC)
 License:        ASL 2.0
 URL:            https://github.com/iovisor/bcc
 Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 
+# https://bugzilla.redhat.com/show_bug.cgi?id=1679310
+Patch0:         %{name}-%{version}-usdt-s390x.patch
+
 # Arches will be included as upstream support is added and dependencies are
 # satisfied in the respective arches
-ExclusiveArch:  x86_64 %{power64} aarch64
+ExclusiveArch:  x86_64 %{power64} aarch64 s390x
 
 BuildRequires:  bison, cmake >= 2.8.7, flex, libxml2-devel
 BuildRequires:  python3-devel
@@ -165,6 +168,9 @@ mv %{buildroot}%{_datadir}/%{name}/examples %{buildroot}%{_docdir}/%{name}/
 
 
 %changelog
+* Tue Mar 19 2019 Rafael dos Santos <rdossant@redhat.com> - 0.8.0-4
+- Add s390x support (#1679310)
+
 * Wed Feb 20 2019 Rafael dos Santos <rdossant@redhat.com> - 0.8.0-3
 - Add aarch64 support (#1679310)
 
