@@ -9,7 +9,7 @@
 
 Name:           bcc
 Version:        0.8.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        BPF Compiler Collection (BCC)
 License:        ASL 2.0
 URL:            https://github.com/iovisor/bcc
@@ -22,16 +22,20 @@ Patch0:         %{name}-%{version}-usdt-s390x.patch
 # satisfied in the respective arches
 ExclusiveArch:  x86_64 %{power64} aarch64 s390x
 
-BuildRequires:  bison, cmake >= 2.8.7, flex, libxml2-devel
+BuildRequires:  bison
+BuildRequires:  cmake >= 2.8.7
+BuildRequires:  flex
+BuildRequires:  libxml2-devel
 BuildRequires:  python3-devel
 BuildRequires:  elfutils-libelf-devel
-BuildRequires:  llvm-devel clang-devel
+BuildRequires:  llvm-devel
+BuildRequires:  clang-devel
 %if %{with llvm_static}
-BuildRequires: llvm-static
+BuildRequires:  llvm-static
 %endif
 BuildRequires:  ncurses-devel
 %if %{with lua}
-BuildRequires: pkgconfig(luajit)
+BuildRequires:  pkgconfig(luajit)
 %endif
 
 Requires:       %{name}-tools = %{version}-%{release}
@@ -67,7 +71,8 @@ Examples for BPF Compiler Collection (BCC)
 
 %package -n python3-%{name}
 Summary:        Python3 bindings for BPF Compiler Collection (BCC)
-Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
+BuildArch:      noarch
 %{?python_provide:%python_provide python3-%{srcname}}
 
 %description -n python3-%{name}
@@ -127,6 +132,9 @@ done
 mkdir -p %{buildroot}%{_docdir}/%{name}
 mv %{buildroot}%{_datadir}/%{name}/examples %{buildroot}%{_docdir}/%{name}/
 
+# Delete old tools we don't want to ship
+rm -rf %{buildroot}%{_datadir}/%{name}/tools/old/
+
 # We cannot run the test suit since it requires root and it makes changes to
 # the machine (e.g, IP address)
 #%check
@@ -154,11 +162,8 @@ mv %{buildroot}%{_datadir}/%{name}/examples %{buildroot}%{_docdir}/%{name}/
 
 %files tools
 %dir %{_datadir}/%{name}
-%dir %{_datadir}/%{name}/tools
-%dir %{_datadir}/%{name}/introspection
-%{_datadir}/%{name}/tools/*
-%{_datadir}/%{name}/introspection/*
-%exclude %{_datadir}/%{name}/tools/old/
+%{_datadir}/%{name}/tools/
+%{_datadir}/%{name}/introspection/
 %{_mandir}/man8/*
 
 %if %{with lua}
@@ -168,6 +173,10 @@ mv %{buildroot}%{_datadir}/%{name}/examples %{buildroot}%{_docdir}/%{name}/
 
 
 %changelog
+* Mon Apr 22 2019 Neal Gompa <ngompa@datto.com> - 0.8.0-5
+- Make the Python 3 bindings package noarch
+- Small cleanups to the spec
+
 * Tue Mar 19 2019 Rafael dos Santos <rdossant@redhat.com> - 0.8.0-4
 - Add s390x support (#1679310)
 
