@@ -8,15 +8,25 @@
 %bcond_without llvm_static
 
 Name:           bcc
-Version:        0.8.0
-Release:        5%{?dist}
+Version:        0.9.0
+Release:        1%{?dist}
 Summary:        BPF Compiler Collection (BCC)
 License:        ASL 2.0
 URL:            https://github.com/iovisor/bcc
-Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
+# Generate source tarball until upstream bug is fixed
+# See https://github.com/iovisor/bcc/issues/2261
+# To generate the tarball, use the following commands
+# git clone -b "v0.9.0" --single-branch --depth 1 url bcc-0.9.0
+# pushd bcc-0.9.0
+# git submodule update --init
+# popd
+# tar zcvf bcc-0.9.0.tar.gz bcc-0.9.0/
+#Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
+Source0:        %{name}-%{version}.tar.gz
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1679310
-Patch0:         %{name}-%{version}-usdt-s390x.patch
+Patch0:         %{name}-0.8.0-usdt-s390x.patch
+Patch1:         %{name}-%{version}-rename-libbpf.patch
 
 # Arches will be included as upstream support is added and dependencies are
 # satisfied in the respective arches
@@ -145,11 +155,11 @@ rm -rf %{buildroot}%{_datadir}/%{name}/tools/old/
 %doc README.md
 %license LICENSE.txt
 %{_libdir}/lib%{name}.so.*
-%{_libdir}/libbpf.so.*
+%{_libdir}/libbcc_bpf.so.*
 
 %files devel
 %{_libdir}/lib%{name}.so
-%{_libdir}/libbpf.so
+%{_libdir}/libbcc_bpf.so
 %{_libdir}/pkgconfig/lib%{name}.pc
 %{_includedir}/%{name}/
 
@@ -173,6 +183,10 @@ rm -rf %{buildroot}%{_datadir}/%{name}/tools/old/
 
 
 %changelog
+* Thu Apr 25 2019 Rafael dos Santos <rdossant@redhat.com> - 0.9.0-1
+- Rebase to latest upstream version (#1686626)
+- Rename libbpf header to libbcc_bpf
+
 * Mon Apr 22 2019 Neal Gompa <ngompa@datto.com> - 0.8.0-5
 - Make the Python 3 bindings package noarch
 - Small cleanups to the spec
