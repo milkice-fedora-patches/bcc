@@ -23,6 +23,8 @@ URL:            https://github.com/iovisor/bcc
 # tar zcvf bcc-0.11.0.tar.gz bcc-0.11.0/
 #Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
+Patch0:         0001-Add-libbcc-no-libbpf.so-library.patch
+Patch1:         0002-Use-libbpf-static-instead-of-libbpf-debugsource-for-.patch
 
 # Arches will be included as upstream support is added and dependencies are
 # satisfied in the respective arches
@@ -43,8 +45,10 @@ BuildRequires:  ncurses-devel
 %if %{with lua}
 BuildRequires:  pkgconfig(luajit)
 %endif
+BuildRequires:  libbpf-devel >= 0.0.5-3, libbpf-static >= 0.0.5-3
 
 Requires:       %{name}-tools = %{version}-%{release}
+Requires:       libbpf >= 0.0.5-3
 
 %description
 BCC is a toolkit for creating efficient kernel tracing and manipulation
@@ -113,6 +117,7 @@ Command line tools for BPF Compiler Collection (BCC)
 %cmake . \
         -DCMAKE_BUILD_TYPE=RelWithDebInfo \
         -DREVISION_LAST=%{version} -DREVISION=%{version} -DPYTHON_CMD=python3 \
+        -DCMAKE_USE_LIBBPF_PACKAGE:BOOL=TRUE \
         %{?with_llvm_shared:-DENABLE_LLVM_SHARED=1}
 %make_build
 
@@ -152,10 +157,12 @@ rm -rf %{buildroot}%{_datadir}/%{name}/tools/old/
 %license LICENSE.txt
 %{_libdir}/lib%{name}.so.*
 %{_libdir}/libbcc_bpf.so.*
+%{_libdir}/libbcc-no-libbpf.so.*
 
 %files devel
 %{_libdir}/lib%{name}.so
 %{_libdir}/libbcc_bpf.so
+%{_libdir}/libbcc-no-libbpf.so
 %{_libdir}/pkgconfig/lib%{name}.pc
 %{_includedir}/%{name}/
 
@@ -179,6 +186,9 @@ rm -rf %{buildroot}%{_datadir}/%{name}/tools/old/
 
 
 %changelog
+* Thu Dec 05 2019 Jiri Olsa <jolsa@redhat.com> - 0.11.0-2
+- Add libbpf support
+
 * Fri Oct 04 2019 Rafael dos Santos <rdossant@redhat.com> - 0.11.0-1
 - Rebase to latest upstream version (#1758417)
 
