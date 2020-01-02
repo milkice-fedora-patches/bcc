@@ -8,23 +8,17 @@
 %bcond_without llvm_static
 
 Name:           bcc
-Version:        0.11.0
-Release:        2%{?dist}
+Version:        0.12.0
+Release:        1%{?dist}
 Summary:        BPF Compiler Collection (BCC)
 License:        ASL 2.0
 URL:            https://github.com/iovisor/bcc
-# Generate source tarball until upstream bug is fixed
-# See https://github.com/iovisor/bcc/issues/2261
-# To generate the tarball, use the following commands
-# git clone -b "v0.11.0" --single-branch --depth 1 url bcc-0.11.0
-# pushd bcc-0.11.0
-# git submodule update --init
-# popd
-# tar zcvf bcc-0.11.0.tar.gz bcc-0.11.0/
+# Upstream now provides a release with the git submodule embedded in it
+Source0:        %{url}/releases/download/v%{version}/%{name}-src-with-submodule.tar.gz
 #Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
-Patch0:         0001-Add-libbcc-no-libbpf.so-library.patch
-Patch1:         0002-Use-libbpf-static-instead-of-libbpf-debugsource-for-.patch
+
+# https://github.com/iovisor/bcc/issues/2679
+Patch0:         0001-Fix-compilation-error-ppc64le.patch
 
 # Arches will be included as upstream support is added and dependencies are
 # satisfied in the respective arches
@@ -110,7 +104,7 @@ Command line tools for BPF Compiler Collection (BCC)
 
 
 %prep
-%autosetup -p1
+%autosetup -p1 -n %{name}
 
 
 %build
@@ -186,6 +180,9 @@ rm -rf %{buildroot}%{_datadir}/%{name}/tools/old/
 
 
 %changelog
+* Tue Dec 17 2019 Rafael dos Santos <rdossant@redhat.com> - 0.12.0-1
+- Rebase to latest upstream version (#1758417)
+
 * Thu Dec 05 2019 Jiri Olsa <jolsa@redhat.com> - 0.11.0-2
 - Add libbpf support
 
