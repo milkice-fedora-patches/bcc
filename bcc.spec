@@ -8,8 +8,8 @@
 %bcond_without llvm_static
 
 Name:           bcc
-Version:        0.12.0
-Release:        3%{?dist}
+Version:        0.13.0
+Release:        1%{?dist}
 Summary:        BPF Compiler Collection (BCC)
 License:        ASL 2.0
 URL:            https://github.com/iovisor/bcc
@@ -17,9 +17,7 @@ URL:            https://github.com/iovisor/bcc
 Source0:        %{url}/releases/download/v%{version}/%{name}-src-with-submodule.tar.gz
 #Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 
-# https://github.com/iovisor/bcc/issues/2679
-Patch0:         0001-Fix-compilation-error-ppc64le.patch
-Patch1:		0001-Link-against-libclang-cpp.so.patch
+Patch0:         0001-Link-against-libclang-cpp.so.patch
 
 # Arches will be included as upstream support is added and dependencies are
 # satisfied in the respective arches
@@ -155,6 +153,8 @@ rm -rf %{buildroot}%{_datadir}/%{name}/tools/old/
 %{_libdir}/libbcc-no-libbpf.so.*
 
 %files devel
+%exclude %{_libdir}/lib%{name}*.a
+%exclude %{_libdir}/lib%{name}*.la
 %{_libdir}/lib%{name}.so
 %{_libdir}/libbcc_bpf.so
 %{_libdir}/libbcc-no-libbpf.so
@@ -181,6 +181,9 @@ rm -rf %{buildroot}%{_datadir}/%{name}/tools/old/
 
 
 %changelog
+* Wed Feb 26 2020 Rafael dos Santos <rdossant@redhat.com> - 0.13.0-1
+- Rebase to latest upstream version (#1805072)
+
 * Tue Jan 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.12.0-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
 
