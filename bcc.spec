@@ -8,7 +8,7 @@
 %bcond_without llvm_static
 
 Name:           bcc
-Version:        0.13.0
+Version:        0.14.0
 Release:        1%{?dist}
 Summary:        BPF Compiler Collection (BCC)
 License:        ASL 2.0
@@ -16,8 +16,6 @@ URL:            https://github.com/iovisor/bcc
 # Upstream now provides a release with the git submodule embedded in it
 Source0:        %{url}/releases/download/v%{version}/%{name}-src-with-submodule.tar.gz
 #Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
-
-Patch0:         0001-Link-against-libclang-cpp.so.patch
 
 # Arches will be included as upstream support is added and dependencies are
 # satisfied in the respective arches
@@ -181,6 +179,9 @@ rm -rf %{buildroot}%{_datadir}/%{name}/tools/old/
 
 
 %changelog
+* Tue Apr 21 2020 Rafael dos Santos <rdossant@redhat.com> - 0.14.0-1
+- Rebase to latest upstream version (#1826281)
+
 * Wed Feb 26 2020 Rafael dos Santos <rdossant@redhat.com> - 0.13.0-1
 - Rebase to latest upstream version (#1805072)
 
