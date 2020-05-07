@@ -8,7 +8,7 @@
 %bcond_without llvm_static
 
 Name:           bcc
-Version:        0.13.0
+Version:        0.14.0
 Release:        1%{?dist}
 Summary:        BPF Compiler Collection (BCC)
 License:        ASL 2.0
@@ -179,6 +179,9 @@ rm -rf %{buildroot}%{_datadir}/%{name}/tools/old/
 
 
 %changelog
+* Thu May 07 2020 Rafael dos Santos <rdossant@redhat.com> - 0.14.0-1
+- Rebase to latest upstream version (#1826281)
+
 * Fri Feb 28 2020 Rafael dos Santos <rdossant@redhat.com> - 0.13.0-1
 - Rebase to latest upstream version (#1805072)
 
