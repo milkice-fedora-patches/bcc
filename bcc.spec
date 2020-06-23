@@ -8,8 +8,8 @@
 %bcond_without llvm_static
 
 Name:           bcc
-Version:        0.14.0
-Release:        2%{?dist}
+Version:        0.15.0
+Release:        1%{?dist}
 Summary:        BPF Compiler Collection (BCC)
 License:        ASL 2.0
 URL:            https://github.com/iovisor/bcc
@@ -179,6 +179,9 @@ rm -rf %{buildroot}%{_datadir}/%{name}/tools/old/
 
 
 %changelog
+* Tue Jun 23 2020 Rafael dos Santos <rdossant@redhat.com> - 0.15.0-1
+- Rebase to latest upstream version (#1849239)
+
 * Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 0.14.0-2
 - Rebuilt for Python 3.9
 
