@@ -9,13 +9,15 @@
 
 Name:           bcc
 Version:        0.15.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        BPF Compiler Collection (BCC)
 License:        ASL 2.0
 URL:            https://github.com/iovisor/bcc
 # Upstream now provides a release with the git submodule embedded in it
 Source0:        %{url}/releases/download/v%{version}/%{name}-src-with-submodule.tar.gz
 #Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
+
+Patch0:         %{name}-%{version}-Reinstate-bpf_detach_kfunc.patch
 
 # Arches will be included as upstream support is added and dependencies are
 # satisfied in the respective arches
@@ -179,6 +181,9 @@ rm -rf %{buildroot}%{_datadir}/%{name}/tools/old/
 
 
 %changelog
+* Thu Jul 02 2020 Rafael dos Santos <rdossant@redhat.com> - 0.15.0-2
+- Reinstate a function needed by bpftrace
+
 * Tue Jun 23 2020 Rafael dos Santos <rdossant@redhat.com> - 0.15.0-1
 - Rebase to latest upstream version (#1849239)
 
