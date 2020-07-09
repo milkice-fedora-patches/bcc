@@ -5,11 +5,15 @@
 %bcond_without lua
 %endif
 
-%bcond_without llvm_static
+%bcond_with llvm_static
+
+%if %{without llvm_static}
+%global with_llvm_shared 1
+%endif
 
 Name:           bcc
 Version:        0.15.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        BPF Compiler Collection (BCC)
 License:        ASL 2.0
 URL:            https://github.com/iovisor/bcc
@@ -181,6 +185,10 @@ rm -rf %{buildroot}%{_datadir}/%{name}/tools/old/
 
 
 %changelog
+* Thu Jul 09 2020 Tom Stellard <tstellar@redhat.com> - 0.15.0-3
+- Drop llvm-static dependency
+- https://docs.fedoraproject.org/en-US/packaging-guidelines/#_statically_linking_executables
+
 * Thu Jul 02 2020 Rafael dos Santos <rdossant@redhat.com> - 0.15.0-2
 - Reinstate a function needed by bpftrace
 
