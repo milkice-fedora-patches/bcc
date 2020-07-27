@@ -13,7 +13,7 @@
 
 Name:           bcc
 Version:        0.15.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        BPF Compiler Collection (BCC)
 License:        ASL 2.0
 URL:            https://github.com/iovisor/bcc
@@ -185,6 +185,9 @@ rm -rf %{buildroot}%{_datadir}/%{name}/tools/old/
 
 
 %changelog
+* Mon Jul 27 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.15.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
 * Thu Jul 09 2020 Tom Stellard <tstellar@redhat.com> - 0.15.0-3
 - Drop llvm-static dependency
 - https://docs.fedoraproject.org/en-US/packaging-guidelines/#_statically_linking_executables
