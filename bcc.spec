@@ -11,9 +11,12 @@
 %global with_llvm_shared 1
 %endif
 
+# Force out of source build
+%undefine __cmake_in_source_build
+
 Name:           bcc
 Version:        0.15.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        BPF Compiler Collection (BCC)
 License:        ASL 2.0
 URL:            https://github.com/iovisor/bcc
@@ -116,11 +119,11 @@ Command line tools for BPF Compiler Collection (BCC)
         -DREVISION_LAST=%{version} -DREVISION=%{version} -DPYTHON_CMD=python3 \
         -DCMAKE_USE_LIBBPF_PACKAGE:BOOL=TRUE \
         %{?with_llvm_shared:-DENABLE_LLVM_SHARED=1}
-%make_build
+%cmake_build
 
 
 %install
-%make_install
+%cmake_install
 
 # Fix python shebangs
 find %{buildroot}%{_datadir}/%{name}/{tools,examples} -type f -exec \
@@ -185,6 +188,9 @@ rm -rf %{buildroot}%{_datadir}/%{name}/tools/old/
 
 
 %changelog
+* Tue Aug 04 2020 Rafael dos Santos <rdossant@redhat.com> - 0.15.0-6
+- Fix build with cmake (#1863243)
+
 * Sat Aug 01 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.15.0-5
 - Second attempt - Rebuilt for
   https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
