@@ -15,8 +15,8 @@
 %undefine __cmake_in_source_build
 
 Name:           bcc
-Version:        0.15.0
-Release:        6%{?dist}
+Version:        0.16.0
+Release:        1%{?dist}
 Summary:        BPF Compiler Collection (BCC)
 License:        ASL 2.0
 URL:            https://github.com/iovisor/bcc
@@ -24,7 +24,7 @@ URL:            https://github.com/iovisor/bcc
 Source0:        %{url}/releases/download/v%{version}/%{name}-src-with-submodule.tar.gz
 #Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 
-Patch0:         %{name}-%{version}-Reinstate-bpf_detach_kfunc.patch
+Patch0:         %{name}-0.15.0-Reinstate-bpf_detach_kfunc.patch
 
 # Arches will be included as upstream support is added and dependencies are
 # satisfied in the respective arches
@@ -188,6 +188,9 @@ rm -rf %{buildroot}%{_datadir}/%{name}/tools/old/
 
 
 %changelog
+* Sun Aug 23 2020 Rafael dos Santos <rdossant@redhat.com> - 0.16.0-1
+- Rebase to latest upstream (#1871417)
+
 * Tue Aug 04 2020 Rafael dos Santos <rdossant@redhat.com> - 0.15.0-6
 - Fix build with cmake (#1863243)
 
