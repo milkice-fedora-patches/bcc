@@ -16,7 +16,7 @@
 
 Name:           bcc
 Version:        0.16.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        BPF Compiler Collection (BCC)
 License:        ASL 2.0
 URL:            https://github.com/iovisor/bcc
@@ -25,10 +25,11 @@ Source0:        %{url}/releases/download/v%{version}/%{name}-src-with-submodule.
 #Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 
 Patch0:         %{name}-0.15.0-Reinstate-bpf_detach_kfunc.patch
+Patch1:         0001-tests-only-run-arg-parser-test-on-supported-arches.patch
 
 # Arches will be included as upstream support is added and dependencies are
 # satisfied in the respective arches
-ExclusiveArch:  x86_64 %{power64} aarch64 s390x
+ExclusiveArch:  x86_64 %{power64} aarch64 s390x armv7hl
 
 BuildRequires:  bison
 BuildRequires:  cmake >= 2.8.7
@@ -188,6 +189,9 @@ rm -rf %{buildroot}%{_datadir}/%{name}/tools/old/
 
 
 %changelog
+* Fri Aug 28 2020 Rafael dos Santos <rdossant@redhat.com> - 0.16.0-2
+- Enable build for armv7hl
+
 * Sun Aug 23 2020 Rafael dos Santos <rdossant@redhat.com> - 0.16.0-1
 - Rebase to latest upstream (#1871417)
 
