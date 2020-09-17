@@ -1,0 +1,36 @@
+From a8e0830aa51a33181bc4de484bfc076d02c7e8a5 Mon Sep 17 00:00:00 2001
+From: Rafael Fonseca <r4f4rfs@gmail.com>
+Date: Wed, 2 Sep 2020 09:59:11 +0200
+Subject: [PATCH] tests: only run arg parser test on supported arches
+
+Fixes #3077
+
+Signed-off-by: Rafael Fonseca <r4f4rfs@gmail.com>
+---
+ tests/cc/test_usdt_args.cc | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/tests/cc/test_usdt_args.cc b/tests/cc/test_usdt_args.cc
+index c2c5fff3..b8db58d2 100644
+--- a/tests/cc/test_usdt_args.cc
++++ b/tests/cc/test_usdt_args.cc
+@@ -52,6 +52,10 @@ static void verify_register(USDT::ArgumentParser &parser, int arg_size,
+   REQUIRE(arg.scale() == scale);
+ }
+ 
++/* supported arches only */
++#if defined(__aarch64__) || defined(__powerpc64__) || \
++    defined(__s390x__) || defined(__x86_64__)
++
+ TEST_CASE("test usdt argument parsing", "[usdt]") {
+   SECTION("parse failure") {
+ #ifdef __aarch64__
+@@ -205,3 +209,5 @@ TEST_CASE("test usdt argument parsing", "[usdt]") {
+     REQUIRE(parser.done());
+   }
+ }
++
++#endif /* supported arches only */
+-- 
+2.26.2
+
