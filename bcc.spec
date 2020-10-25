@@ -16,7 +16,7 @@
 
 Name:           bcc
 Version:        0.16.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        BPF Compiler Collection (BCC)
 License:        ASL 2.0
 URL:            https://github.com/iovisor/bcc
@@ -188,6 +188,9 @@ rm -rf %{buildroot}%{_datadir}/%{name}/tools/old/
 
 
 %changelog
+* Sun Oct 25 2020 Rafael dos Santos <rdossant@redhat.com> - 0.16.0-2
+- Rebuilt for LLVM 11 (#1891305)
+
 * Sun Aug 23 2020 Rafael dos Santos <rdossant@redhat.com> - 0.16.0-1
 - Rebase to latest upstream (#1871417)
 
