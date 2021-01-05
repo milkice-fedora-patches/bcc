@@ -11,6 +11,13 @@
 %global with_llvm_shared 1
 %endif
 
+# LTO causes
+# /usr/bin/ld: CMakeFiles/test_libbcc.dir/test_bpf_table.cc.o (symbol from plugin):
+# undefined reference to symbol '_ZZNSt8__detail18__to_chars_10_implIjEEvPcjT_E8__digits@@LLVM_11'
+%ifarch armv7hl
+%global _lto_cflags %{nil}
+%endif
+
 # Force out of source build
 %undefine __cmake_in_source_build
 
