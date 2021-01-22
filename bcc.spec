@@ -23,7 +23,7 @@
 
 Name:           bcc
 Version:        0.18.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        BPF Compiler Collection (BCC)
 License:        ASL 2.0
 URL:            https://github.com/iovisor/bcc
@@ -195,6 +195,9 @@ rm -rf %{buildroot}%{_datadir}/%{name}/tools/old/
 
 
 %changelog
+* Fri Jan 22 2021 Tom Stellard <tstellar@redhat.com> - 0.18.0-2
+- Rebuild for clang-11.1.0
+
 * Tue Jan  5 15:08:26 CET 2021 Rafael dos Santos <rdossant@redhat.com> - 0.18.0-1
 - Rebase to latest upstream (#1912875)
 
