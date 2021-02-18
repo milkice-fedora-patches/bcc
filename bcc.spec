@@ -1,8 +1,13 @@
+# We don't want to bring luajit in RHEL
+%if 0%{?rhel} > 0
+%bcond_with lua
+%else
 # luajit is not available for some architectures
 %ifarch ppc64 ppc64le s390x
 %bcond_with lua
 %else
 %bcond_without lua
+%endif
 %endif
 
 %bcond_with llvm_static
@@ -23,7 +28,7 @@
 
 Name:           bcc
 Version:        0.18.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        BPF Compiler Collection (BCC)
 License:        ASL 2.0
 URL:            https://github.com/iovisor/bcc
@@ -195,6 +200,9 @@ rm -rf %{buildroot}%{_datadir}/%{name}/tools/old/
 
 
 %changelog
+* Thu Feb 18 2021 Jerome Marchand <jmarchan@redhat.com> - 0.18.0-4
+- Disable lua for RHEL
+
 * Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.18.0-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 
