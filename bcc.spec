@@ -10,6 +10,12 @@
 %endif
 %endif
 
+%ifarch x86_64 ppc64 ppc64le aarch64
+%bcond_without libbpf_tools
+%else
+%bcond_with libbpf_tools
+%endif
+
 %bcond_with llvm_static
 
 %if %{without llvm_static}
@@ -28,7 +34,7 @@
 
 Name:           bcc
 Version:        0.19.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        BPF Compiler Collection (BCC)
 License:        ASL 2.0
 URL:            https://github.com/iovisor/bcc
@@ -120,6 +126,15 @@ Requires:       kernel-devel
 %description tools
 Command line tools for BPF Compiler Collection (BCC)
 
+%if %{with libbpf_tools}
+%package -n libbpf-tools
+Summary:        Command line libbpf tools for BPF Compiler Collection (BCC)
+BuildRequires:  libbpf-devel >= 0.0.5-3, libbpf-static >= 0.0.5-3
+BuildRequires:  bpftool
+
+%description -n libbpf-tools
+Command line libbpf tools for BPF Compiler Collection (BCC)
+%endif
 
 %prep
 %autosetup -p1 -n %{name}
@@ -133,6 +148,18 @@ Command line tools for BPF Compiler Collection (BCC)
         %{?with_llvm_shared:-DENABLE_LLVM_SHARED=1}
 %cmake_build
 
+# It was discussed and agreed to package libbpf-tools with
+# 'bpf-' prefix (https://github.com/iovisor/bcc/pull/3263)
+# Installing libbpf-tools binaries in temp directory and
+# renaming them in there and the install code will just
+# take them.
+%if %{with libbpf_tools}
+pushd libbpf-tools;
+make BPFTOOL=bpftool
+make DESTDIR=./tmp-install prefix= install
+(cd tmp-install/bin; for file in *; do mv $file bpf-$file; done;)
+popd
+%endif
 
 %install
 %cmake_install
@@ -161,6 +188,11 @@ rm -rf %{buildroot}%{_datadir}/%{name}/tools/old/
 # We cannot run the test suit since it requires root and it makes changes to
 # the machine (e.g, IP address)
 #%check
+
+%if %{with libbpf_tools}
+mkdir -p %{buildroot}/%{_sbindir}
+install libbpf-tools/tmp-install/bin/* %{buildroot}/%{_sbindir}
+%endif
 
 %ldconfig_scriptlets
 
@@ -196,8 +228,15 @@ rm -rf %{buildroot}%{_datadir}/%{name}/tools/old/
 %{_bindir}/bcc-lua
 %endif
 
+%if %{with libbpf_tools}
+%files -n libbpf-tools
+%{_sbindir}/bpf-*
+%endif
 
 %changelog
+* Wed Mar 29 2021 Jiri Olsa <jolsa@redhat.com> - 0.19.0-2
+- add libbpf-tools package
+
 * Mon Mar 29 2021 Jiri Olsa <jolsa@redhat.com> - 0.19.0-1
 - Rebase to latest upstream
 
