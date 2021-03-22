@@ -27,8 +27,8 @@
 %undefine __cmake_in_source_build
 
 Name:           bcc
-Version:        0.18.0
-Release:        4%{?dist}
+Version:        0.19.0
+Release:        1%{?dist}
 Summary:        BPF Compiler Collection (BCC)
 License:        ASL 2.0
 URL:            https://github.com/iovisor/bcc
@@ -169,14 +169,12 @@ rm -rf %{buildroot}%{_datadir}/%{name}/tools/old/
 %license LICENSE.txt
 %{_libdir}/lib%{name}.so.*
 %{_libdir}/libbcc_bpf.so.*
-%{_libdir}/libbcc-no-libbpf.so.*
 
 %files devel
 %exclude %{_libdir}/lib%{name}*.a
 %exclude %{_libdir}/lib%{name}*.la
 %{_libdir}/lib%{name}.so
 %{_libdir}/libbcc_bpf.so
-%{_libdir}/libbcc-no-libbpf.so
 %{_libdir}/pkgconfig/lib%{name}.pc
 %{_includedir}/%{name}/
 
@@ -200,6 +198,9 @@ rm -rf %{buildroot}%{_datadir}/%{name}/tools/old/
 
 
 %changelog
+* Mon Mar 29 2021 Jiri Olsa <jolsa@redhat.com> - 0.19.0-1
+- Rebase to latest upstream
+
 * Thu Feb 18 2021 Jerome Marchand <jmarchan@redhat.com> - 0.18.0-4
 - Disable lua for RHEL
 
