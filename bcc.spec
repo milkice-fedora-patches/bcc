@@ -34,7 +34,7 @@
 
 Name:           bcc
 Version:        0.19.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        BPF Compiler Collection (BCC)
 License:        ASL 2.0
 URL:            https://github.com/iovisor/bcc
@@ -122,6 +122,8 @@ Summary:        Command line tools for BPF Compiler Collection (BCC)
 Requires:       python3-%{name} = %{version}-%{release}
 Requires:       python3-netaddr
 Requires:       kernel-devel
+# https://bugzilla.redhat.com/show_bug.cgi?id=1869006
+Suggests:       tar
 
 %description tools
 Command line tools for BPF Compiler Collection (BCC)
@@ -234,6 +236,9 @@ install libbpf-tools/tmp-install/bin/* %{buildroot}/%{_sbindir}
 %endif
 
 %changelog
+* Tue Apr 27 2021 Rafael dos Santos <rdossant@redhat.com> - 0.19.0-3
+- Resolves #1869006
+
 * Wed Mar 29 2021 Jiri Olsa <jolsa@redhat.com> - 0.19.0-2
 - add libbpf-tools package
 
