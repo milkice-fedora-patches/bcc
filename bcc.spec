@@ -34,7 +34,7 @@
 
 Name:           bcc
 Version:        0.19.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        BPF Compiler Collection (BCC)
 License:        ASL 2.0
 URL:            https://github.com/iovisor/bcc
@@ -68,6 +68,7 @@ BuildRequires:  libbpf-devel >= 0.0.5-3, libbpf-static >= 0.0.5-3
 Requires:       %{name}-tools = %{version}-%{release}
 Requires:       libbpf >= 0.0.5-3
 Requires:       tar
+Recommends:     kernel-devel
 
 %description
 BCC is a toolkit for creating efficient kernel tracing and manipulation
@@ -234,6 +235,9 @@ install libbpf-tools/tmp-install/bin/* %{buildroot}/%{_sbindir}
 %endif
 
 %changelog
+* Tue May 04 2021 Jiri Olsa <jolsa@redhat.com> - 0.19.0-5
+- Keeping kernel-devel as weak dependency, resolves #1955154
+
 * Fri Apr 30 2021 Jiri Olsa <jolsa@redhat.com> - 0.19.0-4
 - Removing kernel-devel dependency, resolves #1955154
 
