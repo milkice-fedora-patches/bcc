@@ -22,19 +22,12 @@
 %global with_llvm_shared 1
 %endif
 
-# LTO causes
-# /usr/bin/ld: CMakeFiles/test_libbcc.dir/test_bpf_table.cc.o (symbol from plugin):
-# undefined reference to symbol '_ZZNSt8__detail18__to_chars_10_implIjEEvPcjT_E8__digits@@LLVM_11'
-%ifarch armv7hl
-%global _lto_cflags %{nil}
-%endif
-
 # Force out of source build
 %undefine __cmake_in_source_build
 
 Name:           bcc
 Version:        0.19.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        BPF Compiler Collection (BCC)
 License:        ASL 2.0
 URL:            https://github.com/iovisor/bcc
@@ -235,6 +228,9 @@ install libbpf-tools/tmp-install/bin/* %{buildroot}/%{_sbindir}
 %endif
 
 %changelog
+* Tue May 11 2021 Jeff Law <jlaw@tachyum.com> - 0.19.0-6
+- Re-enable LTO
+
 * Tue May 04 2021 Jiri Olsa <jolsa@redhat.com> - 0.19.0-5
 - Keeping kernel-devel as weak dependency, resolves #1955154
 
