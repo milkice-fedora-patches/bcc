@@ -26,16 +26,14 @@
 %undefine __cmake_in_source_build
 
 Name:           bcc
-Version:        0.19.0
-Release:        6%{?dist}
+Version:        0.20.0
+Release:        1%{?dist}
 Summary:        BPF Compiler Collection (BCC)
 License:        ASL 2.0
 URL:            https://github.com/iovisor/bcc
 # Upstream now provides a release with the git submodule embedded in it
 Source0:        %{url}/releases/download/v%{version}/%{name}-src-with-submodule.tar.gz
 #Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
-
-Patch0:         %{name}-0.15.0-Reinstate-bpf_detach_kfunc.patch
 
 # Arches will be included as upstream support is added and dependencies are
 # satisfied in the respective arches
@@ -228,6 +226,9 @@ install libbpf-tools/tmp-install/bin/* %{buildroot}/%{_sbindir}
 %endif
 
 %changelog
+* Mon May 17 2021 Rafael dos Santos <rdossant@redhat.com> - 0.20.0-1
+- Rebase to latest upstream (#1957727)
+
 * Tue May 11 2021 Jeff Law <jlaw@tachyum.com> - 0.19.0-6
 - Re-enable LTO
 
