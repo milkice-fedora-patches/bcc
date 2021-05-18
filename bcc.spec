@@ -27,13 +27,11 @@
 
 Name:           bcc
 Version:        0.20.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        BPF Compiler Collection (BCC)
 License:        ASL 2.0
 URL:            https://github.com/iovisor/bcc
-# Upstream now provides a release with the git submodule embedded in it
-Source0:        %{url}/releases/download/v%{version}/%{name}-src-with-submodule.tar.gz
-#Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
+Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 
 # Arches will be included as upstream support is added and dependencies are
 # satisfied in the respective arches
@@ -129,7 +127,7 @@ Command line libbpf tools for BPF Compiler Collection (BCC)
 %endif
 
 %prep
-%autosetup -p1 -n %{name}
+%autosetup -p1
 
 
 %build
@@ -147,7 +145,7 @@ Command line libbpf tools for BPF Compiler Collection (BCC)
 # take them.
 %if %{with libbpf_tools}
 pushd libbpf-tools;
-make BPFTOOL=bpftool
+make BPFTOOL=bpftool LIBBPF_OBJ=%{_libdir}/libbpf.a
 make DESTDIR=./tmp-install prefix= install
 (cd tmp-install/bin; for file in *; do mv $file bpf-$file; done;)
 popd
@@ -226,6 +224,9 @@ install libbpf-tools/tmp-install/bin/* %{buildroot}/%{_sbindir}
 %endif
 
 %changelog
+* Tue May 18 2021 Jerome Marchand <jmarchan@redhat.com> - 0.20.0-2
+- Build bcc from standard sources
+
 * Mon May 17 2021 Rafael dos Santos <rdossant@redhat.com> - 0.20.0-1
 - Rebase to latest upstream (#1957727)
 
