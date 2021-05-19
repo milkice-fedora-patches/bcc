@@ -27,16 +27,14 @@
 %undefine __cmake_in_source_build
 
 Name:           bcc
-Version:        0.18.0
-Release:        4%{?dist}
+Version:        0.20.0
+Release:        1%{?dist}
 Summary:        BPF Compiler Collection (BCC)
 License:        ASL 2.0
 URL:            https://github.com/iovisor/bcc
 # Upstream now provides a release with the git submodule embedded in it
 Source0:        %{url}/releases/download/v%{version}/%{name}-src-with-submodule.tar.gz
 #Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
-
-Patch0:         %{name}-0.15.0-Reinstate-bpf_detach_kfunc.patch
 
 # Arches will be included as upstream support is added and dependencies are
 # satisfied in the respective arches
@@ -59,8 +57,11 @@ BuildRequires:  pkgconfig(luajit)
 %endif
 BuildRequires:  libbpf-devel >= 0.0.5-3, libbpf-static >= 0.0.5-3
 
-Requires:       %{name}-tools = %{version}-%{release}
 Requires:       libbpf >= 0.0.5-3
+Requires:       tar
+Recommends:     kernel-devel
+
+Recommends:     %{name}-tools = %{version}-%{release}
 
 %description
 BCC is a toolkit for creating efficient kernel tracing and manipulation
@@ -115,7 +116,6 @@ Standalone tool to run BCC tracers written in Lua
 Summary:        Command line tools for BPF Compiler Collection (BCC)
 Requires:       python3-%{name} = %{version}-%{release}
 Requires:       python3-netaddr
-Requires:       kernel-devel
 
 %description tools
 Command line tools for BPF Compiler Collection (BCC)
@@ -200,6 +200,10 @@ rm -rf %{buildroot}%{_datadir}/%{name}/tools/old/
 
 
 %changelog
+* Tue May 18 2021 Rafael dos Santos <rdossant@redhat.com> - 0.20.0-1
+- Rebase to latest upstream (#1957727)
+- Don't require bcc-tools by default (#1966953)
+
 * Thu Feb 18 2021 Jerome Marchand <jmarchan@redhat.com> - 0.18.0-4
 - Disable lua for RHEL
 
