@@ -27,7 +27,7 @@
 
 Name:           bcc
 Version:        0.20.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        BPF Compiler Collection (BCC)
 License:        ASL 2.0
 URL:            https://github.com/iovisor/bcc
@@ -54,10 +54,11 @@ BuildRequires:  pkgconfig(luajit)
 %endif
 BuildRequires:  libbpf-devel >= 0.0.5-3, libbpf-static >= 0.0.5-3
 
-Requires:       %{name}-tools = %{version}-%{release}
 Requires:       libbpf >= 0.0.5-3
 Requires:       tar
 Recommends:     kernel-devel
+
+Recommends:     %{name}-tools = %{version}-%{release}
 
 %description
 BCC is a toolkit for creating efficient kernel tracing and manipulation
@@ -224,6 +225,9 @@ install libbpf-tools/tmp-install/bin/* %{buildroot}/%{_sbindir}
 %endif
 
 %changelog
+* Wed Jun 02 2021 Rafael dos Santos <rdossant@redhat.com> - 0.20.0-3
+- Don't require bcc-tools by default (#1966953)
+
 * Tue May 18 2021 Jerome Marchand <jmarchan@redhat.com> - 0.20.0-2
 - Build bcc from standard sources
 
