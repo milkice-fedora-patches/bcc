@@ -27,7 +27,7 @@
 
 Name:           bcc
 Version:        0.20.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        BPF Compiler Collection (BCC)
 License:        ASL 2.0
 URL:            https://github.com/iovisor/bcc
@@ -225,6 +225,9 @@ install libbpf-tools/tmp-install/bin/* %{buildroot}/%{_sbindir}
 %endif
 
 %changelog
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 0.20.0-4
+- Rebuilt for Python 3.10
+
 * Wed Jun 02 2021 Rafael dos Santos <rdossant@redhat.com> - 0.20.0-3
 - Don't require bcc-tools by default (#1966953)
 
