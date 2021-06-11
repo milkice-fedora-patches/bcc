@@ -28,7 +28,7 @@
 
 Name:           bcc
 Version:        0.20.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        BPF Compiler Collection (BCC)
 License:        ASL 2.0
 URL:            https://github.com/iovisor/bcc
@@ -196,6 +196,9 @@ rm -rf %{buildroot}%{_datadir}/%{name}/tools/old/
 
 
 %changelog
+* Fri Jun 11 2021 Rafael dos Santos <rdossant@redhat.com> - 0.20.0-2
+- Rebuild with correct tarball
+
 * Tue May 18 2021 Rafael dos Santos <rdossant@redhat.com> - 0.20.0-1
 - Rebase to latest upstream (#1957727)
 - Don't require bcc-tools by default (#1966953)
