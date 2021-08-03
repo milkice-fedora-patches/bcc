@@ -1,0 +1,32 @@
+From a3c61b4b296da193fd77b06a6a9a4eb655a6cf76 Mon Sep 17 00:00:00 2001
+From: Jerome Marchand <jmarchan@redhat.com>
+Date: Fri, 30 Jul 2021 18:15:05 +0200
+Subject: [PATCH] libbpf-tools: readahead: don't mark struct hist as static
+
+Libbpf readahead tool does not compile with bpftool v5.14. Since
+commit 31332ccb756 ("bpftool: Stop emitting static variables in BPF
+skeleton"), bpftool gen skeleton does not include static variables
+into the skeleton file anymore.
+
+Fixes the following compilation error:
+readahead.c: In function 'main':
+readahead.c:153:26: error: 'struct readahead_bpf__bss' has no member named 'hist'
+  153 |         histp = &obj->bss->hist;
+      |                          ^~
+---
+ libbpf-tools/readahead.bpf.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libbpf-tools/readahead.bpf.c b/libbpf-tools/readahead.bpf.c
+index ba22e534c4..b9423c3f9a 100644
+--- a/libbpf-tools/readahead.bpf.c
++++ b/libbpf-tools/readahead.bpf.c
+@@ -24,7 +24,7 @@ struct {
+ 	__uint(map_flags, BPF_F_NO_PREALLOC);
+ } birth SEC(".maps");
+ 
+-static struct hist hist;
++struct hist hist = {};
+ 
+ SEC("fentry/do_page_cache_ra")
+ int BPF_PROG(do_page_cache_ra)
