@@ -26,15 +26,12 @@
 %undefine __cmake_in_source_build
 
 Name:           bcc
-Version:        0.21.0
+Version:        0.22.0
 Release:        1%{?dist}
 Summary:        BPF Compiler Collection (BCC)
 License:        ASL 2.0
 URL:            https://github.com/iovisor/bcc
 Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
-
-# https://bugzilla.redhat.com/show_bug.cgi?id=1987381
-Patch0:         libbpftools-readahead-fix.patch
 
 # Arches will be included as upstream support is added and dependencies are
 # satisfied in the respective arches
@@ -243,6 +240,9 @@ cp -a libbpf-tools/tmp-install/bin/* %{buildroot}/%{_sbindir}/
 %endif
 
 %changelog
+* Thu Sep 16 2021 Rafael dos Santos <rdossant@redhat.com> - 0.22.0-1
+- Rebase to latest release version
+
 * Mon Aug 02 2021 Rafael dos Santos <rdossant@redhat.com> - 0.21.0-1
 - Rebase to latest release version
 - Add support to libdebuginfod
