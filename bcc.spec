@@ -3,7 +3,7 @@
 %bcond_with lua
 %else
 # luajit is not available for some architectures
-%ifarch ppc64 ppc64le s390x
+%ifarch ppc64 ppc64le s390x riscv64
 %bcond_with lua
 %else
 %bcond_without lua
@@ -27,7 +27,7 @@
 
 Name:           bcc
 Version:        0.22.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        BPF Compiler Collection (BCC)
 License:        ASL 2.0
 URL:            https://github.com/iovisor/bcc
@@ -35,7 +35,7 @@ Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 
 # Arches will be included as upstream support is added and dependencies are
 # satisfied in the respective arches
-ExclusiveArch:  x86_64 %{power64} aarch64 s390x armv7hl
+ExclusiveArch:  x86_64 %{power64} aarch64 s390x armv7hl riscv64
 
 BuildRequires:  bison
 BuildRequires:  cmake >= 2.8.7
@@ -240,6 +240,10 @@ cp -a libbpf-tools/tmp-install/bin/* %{buildroot}/%{_sbindir}/
 %endif
 
 %changelog
+* Fri Apr 15 2022 Milkice Qiu <milkice@milkice.me> - 0.22.0-4
+- Enable riscv64 arch
+- Patch from David Abdurachmanov <david.abdurachmanov@gmail.com>
+
 * Wed Jan 19 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.22.0-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
 
